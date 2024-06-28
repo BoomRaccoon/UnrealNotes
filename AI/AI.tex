@@ -1,0 +1,341 @@
+\chapter{AI}%TODO:
+    \section{Basics}
+        \begin{itemize}
+            \item A pawn can be controlled by a player or AI
+            \item AI needs: a component that specifies what it should do (Behavior tree) \& AIController
+            \item AIController: observes the world and makes decisions based on it
+            \item 
+            \item \code{PawnSensing} := older
+            \item \code{Perception-System} := newer
+            \item
+        \end{itemize}
+
+        \uline{AI-Classification}
+            AIs can be differentiated in order to optimize:
+            \begin{itemize}
+                \item Low AIs:
+                \begin{itemize}
+                    \item super low poly
+                    \item gives the illusion of being fully featured
+                \end{itemize}
+                \item Medium AIs:
+                \begin{itemize}
+                    \item clustered
+                    \item running simpler animations
+                    \item low poly
+                \end{itemize}
+                \item High AIs:
+                \begin{itemize}
+                    \item Smart
+                    \item complex animations
+                \end{itemize}
+                \item Culled AIs:
+                \begin{itemize}
+                    \item are not visible by player
+                    \item can stop any dynamic behavior
+                \end{itemize}
+
+            \end{itemize}
+
+            \subsection{Stop AI/BT}
+                 \begin{itemize}
+                    \item best solution: in order to be able to resume the AI you use \code{LockResources}
+                    \begin{itemize}
+                        \item \code{static void LockResources(UBrainComponent* Brain) { Brain->LockResource(EAIRequestPriority::Logic);}}
+                        \item \code{static void LockPathFollowing(AAIController* Controller) { Controller->GetPathFollowingComponent()->LockResource(EAIRequestPriority::Logic); }}
+                    \end{itemize}
+                    \item can be done by unpossessing the pawn
+                    \item OR you use the  \code{Stop Logic}-node from AIController $\rightarrow$ BrainComponent
+                 \end{itemize}
+                  \includegraphics[width=\textwidth]{StopBT.png}
+
+
+    \section{NavMesh}
+        \begin{itemize}
+            \item stop meshes from influencing $\rightarrow$ totally ignore in navigation (invisible for AI)
+            \item and also navigation section of the static mesh
+            \item put the aiperception on the controller (so it is shared between the pawns?)
+        \end{itemize}
+
+
+    \section{Behavior Trees}
+        Stores information about the states you can be in and actions to perform depending on those states.
+        There are 2 types of Nodes
+        \begin{itemize}
+            \item Root: stores properties of the Behavior-Tree(BT); currently only the \code{Blackboard} (BB)
+            \item Composite: Define the root of a branch and the base rules for how that branch is executed:
+            \begin{itemize}
+                \item Selector: executes from left-to-right until an execution is successfull and goes back to parent composite afterwards to continue flow
+                \item Sequence: executes branches from left-to-right until it fails
+                \item Simple Parallel: has 2 connections; 1. can only be a Task 2. is the "background branch"
+            \end{itemize}
+            \item Decorator: is added to other nodes and adds conditions under which the node should be executed
+            \item Service: runs in the background of Tasks\&Composites at a frequency until the subtree finishes; used for checks and to update the BB
+            \item Task: the actual behavior that should be executed (Move, Attack, ...)
+            \begin{itemize}
+                \item a dedicated graph to add functionality via BPs
+                \item "Event Receive Execute AI" := called when this Task is activated
+                \item "Event Receive Abort" := called when this task aborts
+                \item "Event Receive Tick" := %TODO:
+            \end{itemize} 
+        \end{itemize}
+
+    \smallskip
+        The position of the nodes matters LEFT MOST IMPORTANT RIGHT LEAST IMPORTANT
+    \smallskip
+        You have to create tasks for some functionality you might want to have in your game:
+        \begin{itemize}
+            \item Move to a location
+            \item 
+        \end{itemize}
+    \smallskip
+        Useful Nodes in Event Graphes for BTTs
+        \begin{itemize}
+            \item Event Receive Execute AI
+            \item GetRandomReachablePointInRadius
+        \end{itemize}
+
+    \section{Blackboard}
+        In the BB you can specify variables that will influence the behaviour of the AIController
+
+    \section{EQS}%TODO:
+        \begin{itemize}
+            \item allows to query the level
+            \item components:
+            \begin{itemize}
+                \item Generators := used to produce the locations or actors that will be tested and weighted
+                \item Contexts := used as a frame of reference for any Tests or Generators
+            \end{itemize}
+        \end{itemize}
+
+    \section{Perception}
+        \subsection{Basics}
+            \begin{itemize}
+                \item main parts:
+                \begin{itemize}
+                    \item \code{UPawnSensingComponent}
+                    \item \code{UPawnNoiseEmitterComponent}
+                    \item \code{}
+                \end{itemize}
+            \end{itemize}
+        \subsection{Perception Tree}%TODO:
+        \subsection{AI Controllers}%TODO:
+            \begin{itemize}
+                \item is used with a Pawn
+                \item calls the actual BT
+                \item contains a 'AIPerception'-Component
+                \item 
+                \item 
+            \end{itemize}
+        
+        \subsection{AIPerception-Component}
+            \begin{itemize}
+                \item meant for 'AIController'
+                \item 
+                \item listens for 'Stimuli'
+                \item saves 'Stimuli Sources'
+                \item Events:
+                \begin{itemize}
+                    \item On Perception Updated := when stimuli source is registered
+                    \item On Target Perception Updated := for specific stimuli
+                    \item On Component Activated := ... 
+                    \item On Component Deactivated := ...
+                \end{itemize}
+                \item 
+                \item useable Senses:
+                \begin{itemize}
+                    \item AIDamage := how to react on 'Event Any Damage', 'Event Point Damage', 'Event Radial Damage'
+                    \item AIHearing := how to react to detected sounds by 'Report Noise Event'
+                    \item AIPrediction := asks Perception System to supply Requestor with PredictedActor's predicted location in PredictionTime seconds
+                    \item AISight := ...
+                    \item AITeam := tells if someone on the same team is close by
+                    \item AITouch := detect when the AI bumps into something or something bumps into it
+                \end{itemize}
+                \item specifies the Senses the AI should have
+                \item currently affiliation can only be added through C++
+            \end{itemize}
+
+        \subsection{AIPerceptionStimuliSource-Component}
+            \begin{itemize}
+                \item meant for 'Actors' that should influence AI
+            \end{itemize}
+
+    \section{Debugging}
+        \href{https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/ArtificialIntelligence/AIDebugging/#perception}{Official DOCs}
+        \begin{itemize}
+            \item apostrophe to enable AI-debugging in the viewport
+            \item 
+        \end{itemize}
+
+        \subsection{Visual-logger} \label{sec:visuallogger}
+            \begin{itemize}
+                \item timeline of events
+                \item window $\rightarrow$ developer tools $\rightarrow$ visual logger
+                \begin{itemize}
+                    \item timeline
+                    \item info panel (behaviour tree/what state actors are in)
+                    \item debug logger for the recorded timeframe
+                \end{itemize}
+                    \item 
+            \end{itemize}
+            \underline{Code:} \\
+            \includegraphics[width=\textwidth]{VisualLogger.jpg} \\
+
+            \subsubsection{workflow}
+                \begin{itemize}
+                    \item use \code{DEFINE_LOG_CATEGORY_STATIC( LogSampleVisualLog, Log, All )}
+                    \item use a define guard for the actual logging code \code{#if ENABLE_VISUAL_LOG ... #endif}
+                    \item check if it's recording \code{FVisualLogger& Vlog = FVisualLogger.Get();}
+                    \item check if it's recording \code{if( Vlog.IsRecording() )}
+                    \item actually log using:
+                    \begin{itemize}
+                        \item \code{UE_VLOG_LOCATION}
+                        \item \code{UE_VLOG_SEGMENT}
+                        \item \code{UE_VLOG_UELOG}
+                        \item more in \code{VisualLogger.h}
+                    \end{itemize}
+                \end{itemize}
+
+        \subsection{Cheat commands}
+            \begin{itemize}
+                \item can be defined to define commands
+            \end{itemize}
+
+
+    \section{Smart-Objects}
+        \begin{itemize}
+            \item \code{GameplayBehavior} : defines what should be done ()
+            \item \code{GameplayBehaviorConfig} : used to get a CDO of an assigned Gameplay-Behavior and used inside the \code{SmartObjectDefinition}
+            \item \code{SmartObjectDefinition} : defines the behavior for each slot in the SO
+            \item \code{SmartObject}(Component) : the component that is placed on an \code{Actor}; holds a reference a \code{SmartObjectDefinition}
+            \item \code{}
+            \item 
+            \item has to call \code{EndBehavior} $\rightarrow$ will release the SO (set occupied to false)
+            \item 
+        \end{itemize}
+
+        \subsection{Gameplay-Behaviour}
+            \uline{Overridable Functions}
+            \begin{itemize}
+                \item \code{OnFinished}
+                \item \code{OnFinishedCharacter}
+                \item \code{OnFinishedPawn}
+                \item \code{OnTriggered}
+                \item \code{OnTriggeredCharacter}
+                \item \code{OnTriggeredPawn}
+            \end{itemize}
+
+
+        \subsection{SmartObjectSlotDefinitionData}
+            \begin{itemize}
+                \item is an extension to the SmartObjectDefinition in the way that using it you can add special data to use
+                \item can be accessed through \textbf{FStateTreeExecutionContext}
+            \end{itemize}
+
+            \subsubsection{SmartObjectSlotAnnotation}
+                \begin{itemize}
+                    \item adds functionallity to visualize additional data in the viewport
+                    \item examples are:
+                    \begin{itemize}
+                        \item Entry/Exit-points for the SmartObjectSlot
+                    \end{itemize}
+                \end{itemize}
+
+
+
+
+        \subsection{General workflow}
+            \begin{itemize}
+                \item create a \code{GameplayBehavior}
+                \item create a \code{GameplayBehaviorConfig}
+                \item assign the \code{GameplayBehavior} in the \code{GameplayBehaviorConfig}
+                \item define the behavior in the \code{GameplayBehavior} inside one of the Overridable-functions and call \code{EndBehavior}
+                \item 
+                \item create a \code{DataAsset} of type \code{SmartObjectDefinition}
+                \item create a slot in the \code{SmartObjectDefinition} and assign a \code{Default Behavior Definition}
+                \item 
+                \item create an \code{Actor} and add a \code{SmartObject}-Component
+                \item assign the \code{GameplayBehavior} inside of the SO-Component
+                \item 
+                \item create a \code{BT} and \code{Blackboard}
+                \item add a variable of type \code{SO Claim Handle} to the Blackboard
+                \item create a \code{BT-Task} to 'Find the SO' and 'Use the SO'
+                \item in the 'Find the SO' BT-Task use \code{Event Receive Execute AI} and the \code{Smart-Object-Subsystem} to find SmartObjects in a volume around the AI
+                \item 
+                \item 
+            \end{itemize}
+
+
+    \section{StateTree}
+        \begin{itemize}
+            \item Is
+            \begin{itemize}
+                \item \code{StateTreeSchema}: defines which inputs, evaluators and tasks can be used
+                \item \code{FGameplayInteractionContext}: holds the data to perform the action
+                \item 
+            \end{itemize}
+            \item Has
+            \begin{itemize}
+                \item States
+                \item Transitions
+                \item Tasks
+                \item Evaluators
+            \end{itemize}
+        \end{itemize}
+
+        \textbf{Example schema}
+        \begin{lstlisting}
+    UGameplayInteractionStateTreeSchema::UGameplayInteractionStateTreeSchema()
+    : ContextActorClass(AActor::StaticClass())
+    , SmartObjectActorClass(AActor::StaticClass())
+    ,ContextDataDescs({
+        {UE::GameplayInteraction::Names::ContextActor, AActor::StaticClass(), FGuid(0xDFB93B9E, 0xEDBE4906, 0x851C66B2, 0x7585FA21)},
+        {UE::GameplayInteraction::Names::SmartObjectActor, AActor::StaticClass(), FGuid(0x870E433F, 0x99314B95, 0x982B78B0, 0x1B63BBD1)},
+        {UE::GameplayInteraction::Names::SmartObjectClaimedHandle, FSmartObjectClaimHandle::StaticStruct(), FGuid(0x13BAB427, 0x26DB4A4A, 0xBD5F937E, 0xDB39F841)},
+        {UE::GameplayInteraction::Names::SlotEntranceHandle, FSmartObjectSlotEntranceHandle::StaticStruct(), FGuid(0x283CBA09, 0x95CD42CF, 0xA11F510E, 0x17CB3530)},
+        {UE::GameplayInteraction::Names::AbortContext, FGameplayInteractionAbortContext::StaticStruct(), FGuid(0xEED35411, 0x85E844A0, 0x95BE6DB5, 0xB63F51BC)},
+    })
+{
+}
+        \end{lstlisting}
+
+        \subsection{Tasks}
+            \begin{itemize}
+                \item have a:
+                \begin{itemize}
+                    \item \code{Enter State}
+                    \item \code{Tick}
+                    \item \code{Exit State}
+                \end{itemize}
+                \item be carefull with \code{Finish Task}
+            \end{itemize}
+
+
+        \subsection{Random notes}
+            \begin{itemize}
+                \item in order to stop some logic use \code{LockResource} and \code{ClearResourceLock}
+            \end{itemize}
+
+    \section{Contextual Anim Scene}
+        problems (with potential fixes):
+        \begin{itemize}
+            \item motion warping doesn't work 
+            \begin{itemize}
+                \item make sure you set the \code{role} and \code{Target Name} when providing the location and rotation in the task
+                \item the motion warping window is too short (0.7s is the minimum)
+            \end{itemize}
+            \item contextual anim scene doesn't play the lead in animation when it's a little short $\rightarrow$ having a longer animation fixes it but looks weird
+            \item 
+            \item you can define \code{IKTargets} in the \code{Sections}
+        \end{itemize}
+
+        \begin{figure}
+            \includegraphics[width=\textwidth]{ContextualAnimScene_IKTargets.png}
+            \caption{ContextualAnimScene IKTargets can be added in sections}
+            \label{}
+        \end{figure}
+
+    \section{Crowd}
+        Use either DetourCrowd AIController or RVO \\
+        RVO (reciprocal velocity obstacle) avoidance uses forces to push characters while they are moving to avoid each other. \\
+        Detour works by updating the path to do the avoidance. \\

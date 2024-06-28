@@ -1,0 +1,92 @@
+\chapter{Lights}
+    \section{Unsorted}
+        \begin{itemize}
+            \item Sky Light: emit no photon $\rightarrow$ 1 bounce
+            \item Directional, Point and Spot Light emit photons $\rightarrow$ multiple bounces
+            \item while building the level turn off 'Auto Exposure' $\rightarrow$ Project Settings $\rightarrow$ search Exposure $\rightarrow$ set to false
+        \end{itemize}
+    \section{Basics}
+        \subsection{Mobility}
+            \begin{itemize}
+                \item \code{Static}: not  moving or updating in any way; built light; use indirect lighting (indirect ligting sample or volumetric lightmaps)
+                \item \code{Stationary}: not moving; No built light (lightmass); uses Cached Shadow Map for Movable Light
+                \item \code{Movable}: moved and updated; fully dynamic shadow; LIGHT ACTORS only cast dynamic shadows;
+            \end{itemize}
+        
+        \subsection{IES Light}
+            Is a file format describing the light distribution \\
+
+        \subsection{Direct/Indirect}
+
+    \section{Sky Atmosphere}
+        \subsection{Setup}
+            use extra tool for easy setup \code{Window -> Env. Lightmixer} or the following\\
+            \begin{itemize}
+                \item Add a directional light
+                \item Place Directional Light and set Atmosphere/Fog Sun Light in its properties to true
+                \item Add 'SkyAthmosphere'
+                \item Add Sky Light
+            \end{itemize}
+
+            \underline{SkyAtmosphere Properties:}
+            \begin{itemize}
+                \item Planet:
+                \begin{itemize}
+                    \item Ground Radius: Size of the planet (if looked at from high altitude/space)
+                \end{itemize}                
+                \item \code{Rayleigh Exponential Distribution}: to define the altitude (in kilometers) at which Rayleigh scattering effect is reduced to 40\% due to reduced density
+                \item \code{Mie Exponential Distribution}: to define the altitude (in kilometers) at which Mie scattering effect is reduced to 40\% due to reduced density
+                \item \code{Atmospheric Height}: to define the height of the atmosphere above which we stop evaluating light interactions with the atmosphere.        
+            \end{itemize}
+            \includegraphics[width=\textwidth]{PlanetaryView.png}
+
+            \underline{Additional notes}
+                \begin{itemize}
+                    \item Sun at zenith 120000 Lux
+                    \item 150000 Lux on a white surface (measure with AO=off and the luminance meter)
+                    \item Multiscattering in the Sky atmosphere = 1
+                \end{itemize}
+
+        \subsection{Directional Light}
+            Has a 'Cascaded Shadow Map Property' which will display near shadows dynamically and use baked lighting for 
+            lights at farther distance.
+            \begin{table}[H]
+                \begin{tabular}{|p{7cm}|p{12cm}|}
+                    \hline
+                        Property & Description \\
+                    \hline
+                        Dynamic Shadow Distance & Distance within which you will see cascading shadow maps \\
+                        Num Dynamic Shadow Cascades & More levels $\rightarrow$ better shadow resulation at distance with greater performance cost \\
+                        Cascade Distribution Exponent &  \\ % TODO:
+                    \hline
+                \end{tabular}
+            \end{table}  
+
+    \section{Lightmass Global Illumination}
+        Lightmass creates Lightmaps for 'Stationary' and 'Static' lights.\\
+        You have to surround the static light with the 'Lightmass Volume' \\
+        don't forget to set ojects mobility static \\
+
+    \section{Screen Space Global Illumination (SSGI)}
+        Improves the shadows and directional light. Quality Level 3 for the best balance between performance and quality. \\
+        \underline{In order to enable:} \\
+        'Project Settings' $\rightarrow$ 'Engine' $\rightarrow$ 'Rendering' $\rightarrow$ under the Lighting category.  \\
+        \begin{lstlisting}
+    r.SSGI.Quality
+        \end{lstlisting}
+        \underline{render in half resolution}
+        \begin{lstlisting}
+    r.SSGI.HalfRes
+        \end{lstlisting}
+
+    \section{Lumen}
+        \begin{itemize}
+            \item has color bleeding
+            \item soft shadows
+        \end{itemize}
+
+        \begin{itemize}
+            \item directional light
+            \item sky light
+            \item sky atmosphere
+        \end{itemize}

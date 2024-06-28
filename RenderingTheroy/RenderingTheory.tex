@@ -1,0 +1,114 @@
+\chapter{Rendering}
+    \section{Best practices}
+        \begin{itemize}
+            \item eliminate noise while testing
+            \item turn off real time
+            \item standalone mode
+            \item stat unit (show primary threads)
+            \item Draw = CPU
+            \item GPU = GPU
+            \item 
+            \item turn off smooth 'frame rate'
+            \item 'Project Settings'
+            \item 
+            \item Pause button = pause game
+            \item 
+            \item stat unit graph
+        \end{itemize}
+
+
+        \paragraph{GPU} \mbox{} \\
+        \begin{itemize}
+            \item 'profile gpu' grabs all computation for one frame
+            \item 
+            \item 'r.' are the rendering commands
+            \item 
+            \item stat scenerenderin
+        \end{itemize}
+
+        \paragraph{CPU} \mbox{} \\
+        \begin{itemize}
+            \item Window $\rightarrow$ Developer Tools $\rightarrow$ Session Forntend
+            \item Profiler is most useful tab
+            \item Load to load the written file from stat startfile and stat stopfile commands
+            \item 
+            \item 'stat startfile'
+            \item "stat stopfile"
+            \item 
+            \item Blue tag on the side will give more information on the event
+            \item "Avg num of calls" will give indicator on how often the blueprint gets called
+            \item 
+        \end{itemize}
+    \section{Rendering Overview}
+        \begin{itemize}
+            \item rendering := is the process of generating a 2D image from a 3D scene
+            \item the steps involved make up the \code{graphics pipeline}
+            \item and the processing of the data is done by the \code{GPU}
+            \item 
+            \item point = pixel
+            \item line = vector
+            \item plane = filled polygon
+        \end{itemize}
+
+        \begin{table}[!htb]
+            \begin{tblr}{p{8cm} | p{8cm}}
+                \hline
+                    Resolution & 24 bits per pixel \\
+                \hline
+                    128 x 128 & 393.216 \\
+                    256 x 256 & 1.572.864 \\
+                    512 x 512 & 6.291.456 \\
+                    1024 x 1024 & 25.165.824 \\
+                \hline
+            \end{tblr}
+        \caption{ caption }  
+        \end{table}
+
+        \subsection{Antialiasing}
+            \begin{itemize}
+                \item is a technique used to reduce the effect of aliasing
+                \item aliasing := is the distortion; the jagged or stair-step effect on the edges of objects
+                \item is based on sampling := representing a large set of values by an appropriate smaller set
+                \item simple antialiasing techniques: 
+                \begin{itemize}
+                    \item average the color of the pixel
+                    \item average the color of the pixel with its neighbors
+                \end{itemize}
+                \item 
+            \end{itemize}
+        
+        \section{Rendering Pipeline}
+        
+
+
+        \subsection{Stages}
+            \subsubsection{Application Stage}
+                \begin{itemize}
+                    \item is where CPU does the following work:
+                    \begin{itemize}
+                        \item Scene setup: organize and mage all the objects and lights in the scene
+                        \item Animation and physics: calculate the position, rotation and state of objects
+                        \item Culling: determine what is visible and what is not
+                        \item State management: setting up various states like shaders, textures, etc.
+                        \item Batching: combine multiple objects into one draw call
+                        \item Draw call submission: send the draw calls to the GPU
+                    \end{itemize}
+                \end{itemize}
+
+            \subsubsection{Geometry Processing Stage}
+                \begin{itemize}
+                    \item is where the data starts to transition from CPU $\rightarrow$ GPU:
+                    \begin{itemize}
+                        \item Vertex processing: process each vertex
+                        \item Tessellation: optional stage that adds more vertices to the geometry
+                        \item Geometry shader: process each primitive
+                        \item Rasterization: convert the primitives into fragments
+                        \item Fragment shader: process each fragment
+                    \end{itemize}
+                \end{itemize}
+
+    \section{Rendering Pass}
+        \begin{itemize}
+            \item draw calls: is a command from CPU to the GPU to render something
+            \item a pass: are multiple draw calls
+        \end{itemize}

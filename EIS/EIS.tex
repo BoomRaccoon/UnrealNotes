@@ -1,0 +1,160 @@
+\chapter{Enhanced Input}
+
+\section{Genneral Input Stack}
+    \includegraphics[width=\textwidth]{Bilder/InputStack.jpg}
+    \begin{itemize}
+        \item ViewportWidget
+        \item GameViewportClient
+    \end{itemize}
+
+    \begin{itemize}
+        \item InputRouter := used to specify a specific order for input
+        \item PlayerController::BuildInputStack := 
+    \end{itemize}
+
+    \subsection{InputEvent}
+     \includegraphics[width=\textwidth]{Bilder/InputEvents.jpg}
+      \includegraphics[width=\textwidth]{Bilder/NavigationSource.jpg}
+
+\section{How to enable}
+    \begin{itemize}
+        \item Enable the 'Enhanced Input'-Plugin
+        \item 'Project Settings' $\rightarrow$ 'Input' $\rightarrow$ 'Default Classes' $\rightarrow$ Change to 'EnhancedPlayerInput' \& 'EnhancedInputComponent'
+        \item $\uparrow$ can also be done manually by adding following to \code{Config/DefaultInput.ini}
+        \begin{lstlisting}
+[/Script/Engine.InputSettings]
+DefaultPlayerInputClass=/Script/EnhancedInput.EnhancedPlayerInput
+DefaultInputComponentClass=/Script/EnhancedInput.EnhancedInputComponent                
+        \end{lstlisting}
+    \end{itemize}
+
+\section{Main Parts}
+    \begin{itemize}
+        \item \code{UInputActions}:
+        \begin{itemize}
+            \item the main communication link between the Enhanced Input system and the project code
+            \item can be anything that an interactive character might do like jump, open a door or a state like holding a button
+            \item doesn't care where the raw input comes from but \code{has a state}
+            \item eg.: pick up item action is either on or off but walking needs direction and speed
+            \item property-types are:
+            \begin{itemize}
+                \item 
+            \end{itemize}
+        \end{itemize}
+        \item \code{UInputMappingContext}
+        \begin{itemize}
+            \item creates the link between \code{Input} and \code{Action}
+            \item 
+            \item specify conditions to change the key behaviour for different situations
+        \end{itemize}
+        \item Modifiers (inside Actions and MappingContexts)
+        \begin{itemize}
+            \item can adjust the raw input coming from the users device
+        \end{itemize}
+        \item Triggers (inside Actions and MappingContexts)
+        \begin{itemize}
+            \item applied after the raw-input was modified by the Modifiers
+            \item can use output of other Input-Actions
+            \item eg.: One Input-Action must be active to trigger another
+        \end{itemize}
+    \end{itemize}
+
+\section{Using it}
+    \begin{itemize}
+        \item 1. create \code{Input-Actions}
+        \item 2. create \code{Input-Mapping-Context}
+        \item 3. Assign \code{Inputs} to \code{Actions} inside the Input-Mapping-Context
+        \item 4. add Input-Mapping-Context to \code{LocalPlayer}'s \code{Enhanced-Input-Local-Player-Subsystem}
+    \end{itemize}
+
+    \begin{lstlisting}
+// There are ways to bind a UInputAction* to a handler function and multiple types of ETriggerEvent that may be of interest.
+
+// This calls the handler function on the tick when MyInputAction starts, such as when pressing an action button.
+if (MyInputAction)
+{
+PlayerEnhancedInputComponent->BindAction(MyInputAction, ETriggerEvent::Started, this, &AMyPawn::MyInputHandlerFunction);
+}
+
+// This calls the handler function (a UFUNCTION) by name on every tick while the input conditions are met, such as when holding a movement key down.
+if (MyOtherInputAction)
+{
+PlayerEnhancedInputComponent->BindAction(MyOtherInputAction, ETriggerEvent::Triggered, this, TEXT("MyOtherInputHandlerFunction"));
+}
+    \end{lstlisting}
+
+    \uline{Signatures for input handlers}
+    \begin{itemize}
+        \item \code{void ... ()}
+        \item \code{void ... (const FInputActionValue& ActionValue)} := simplest that only tells that input was made
+        \item \code{void ... (const FInputActinoInstance& Action Instance)} := provides access to the current value of the input
+        \item \code{void ... (FInputActionValue ActionValue, float ElapsedTime, float TriggeredTime)} := when dynamically binding to a UFunction by its name
+    \end{itemize}
+
+    \begin{itemize}
+        \item unreal creates a UPlayer for each player:
+        \begin{itemize}
+            \item ULocalPlayer := 
+            \item UNetConnection := 
+        \end{itemize}
+        \item the connection between the UPlayer and the pawns is provided with the playercontroller
+    \end{itemize}
+
+    \uline{needed Headers inside PlayerController:}
+    \begin{itemize}
+        \item \code{#include "InputMappingContext.h"}
+        \item \code{#include "InputAction.h"}
+        \item \code{#include "InputModifiers.h"}
+    \end{itemize}
+        
+    \uline{needed Headers inside Pawn/Character:}
+    \begin{itemize}
+        \item \code{#include "MyPlayerController.h"}
+        \item \code{#include "EnhancedInputComponent.h"}
+        \item \code{#include "EnhancedInputSubsystems.h"}
+    \end{itemize}
+
+    \uline{actual coding needed inside PlayerController}
+    \begin{itemize}
+        \item Ceate Mapping Context(s)
+        \item Create Input Actions
+        \item Assign ValueTypes to the Actions
+        \item Optional: Add modifiers (eg.: invert, clamp, multiply)
+        \item Now the Actions can be mapped to a Key of a Mapping Context
+    \end{itemize}
+
+
+    \subsection{Autorun}
+        \begin{itemize}
+            \item 
+        \end{itemize}
+
+        \begin{figure}[H]
+            \includegraphics[width=\textwidth]{AutoRunEIS.png}
+            \caption{Implementing AutoRun}
+            \label{}
+        \end{figure}
+
+
+\section{Saving}
+
+    \subsection{Overview}
+        \begin{itemize}
+            \item \code{EnhancedInputUserSettings} := is the class that holds the settings for the Enhanced Input system
+            \item 
+            \item PlayerMappableKeySettings :=
+            \begin{itemize}
+                \item Holds setting information of an Action Input or a Action Key Mapping for setting screen and save purposes
+                \item can be set for Input Actions OR overriden in the IMC (Setting Behavior)
+            \end{itemize} 
+        \end{itemize}
+    
+        
+
+
+
+    \begin{itemize}
+        \item 
+    \end{itemize}
+
+\newpage

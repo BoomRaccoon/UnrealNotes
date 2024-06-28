@@ -1,0 +1,56 @@
+\chapter{GameFeaturesModules}
+    \section{Gamefeatures}
+        \begin{itemize}
+            \item offer a quick way to activate and deactivate plugins
+            \item located in \code{Plugins/GameFeatures/} \textbf{on disk}
+            \item located in \code{Plugins/} \textbf{in content browser}
+            \item Plugins to activate:
+            \begin{itemize}
+                \item \code{Game Features}
+                \item \code{Modular Gameplay}
+            \end{itemize}
+            \item automatically add GameFeatures as Primary assets(through \code{Meesage Log}) or manually:
+            \begin{itemize}
+                \item \code{Edit -> Project Settings -> Asset Manager}
+                \item Primary Asset Types to Scan
+                \item add one called GameFeatureData
+                \item uses the \code{GameFeatureData} base-class
+                \item add the directory \code{/Game/Unused} to the Directories array
+                \item Rules and set \code{Cook Rule} = \code{Always Cook}
+            \end{itemize}
+            \item 
+        \end{itemize}
+        
+    \section{Game Framework Component Manager}
+        \begin{itemize}
+            \item is a \code{GameInstance} \code{subsystem}
+            \item inside of \code{Modular Gameplay Plugin}
+            \item designed to work with \code{Game Feature Plugin}
+            \item 
+            \item main Parts:
+            \begin{itemize}
+                \item \code{Extension Handlers: } are delegates that are fired in response to events (like handling new receivers, remove receivers + arbitrary events that are called by gameplay code)
+                \item \code{Initalization States: } 
+            \end{itemize}
+            \item 
+            \item to add \code{Actor} as receiver
+            \begin{itemize}
+                \item from \code{PreInitializeComponents}
+                \item call \code{AddGameFrameworkComponentReceiver()}
+            \end{itemize} 
+            \item remove \code{Actor} as receiver
+            \begin{itemize}
+                \item from \code{EndPlay}
+                \item call \code{RemoveGameFrameworkComponentReceiver}
+            \end{itemize}
+            \item 
+            \item 
+        \end{itemize}
+
+
+        
+
+        \uline{}
+        \begin{itemize}
+            \item 
+        \end{itemize}

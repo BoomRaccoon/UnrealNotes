@@ -1,0 +1,125 @@
+\chapter{Notes on EPIC's example projects}
+    \section{Lyra}
+        \subsection{Main Parts}
+            \begin{itemize}
+                \item \code{Experience}:
+                \begin{itemize}
+                    \item in essence it's a replacement for GameModes
+                    \item you define DataAssets
+                    \item this DataAssets specify the specifics for your GameMode
+                    \item EXAMPLES in Lyra:
+                    \begin{itemize}
+                        \item Front End Menu
+                        \item Shooter Game: Elimination
+                        \item Shooter Game: Control
+                        \item Top Down Arena : Splode
+                    \end{itemize}
+                \end{itemize}
+                \item \code{Actions}:
+                \begin{itemize}
+                    \item contained in Game Features and Experiences
+                    \item EXAMPLES:
+                    \begin{itemize}
+                        \item Add Abilities
+                        \item Add Components
+                        \item Add Widgets
+                    \end{itemize}
+                \end{itemize}
+                \item \code{Pawn Data}:
+                \begin{itemize}
+                    \item describes what is used for Pawns controlled by Players/Bots
+                    \item in detail:
+                    \begin{itemize}
+                        \item Player Pawn Class : which pawn is used (what do we see?)
+                        \item Default Camera Mode : What camera mode is used
+                        \item Abilities : what initial abilities should be granted
+                        \item Ability relationship mapping : 
+                        \item Input configuration : 
+                    \end{itemize}
+                    \item 
+                    \item Default Camera Mode
+                \end{itemize}
+                \item \code{Ability Set}:
+                \begin{itemize}
+                    \item \code{Data Asset}-container for \code{Abilities} \code{Gameplay Effects} and \code{Attribtues}
+                \end{itemize}
+            \end{itemize}
+
+        \subsection{Experience}
+            \begin{itemize}
+                \item Holds:
+                \begin{itemize}
+                    \item Pawn Data
+                    \item Actions
+                \end{itemize}
+            \end{itemize}
+
+        \subsection{Actions}
+            \begin{itemize}
+                \item 
+            \end{itemize}
+
+        \subsection{Input}
+            \begin{figure}
+                \includegraphics[width=\textwidth]{LyraInputOverview.png}
+                \caption{These are the parts used for the input configuration}
+            \end{figure}
+            \begin{itemize}
+                \item \code{Enhanced Input System} is used
+                \item is driven with \code{Hero Data} and \code{Actions}
+                \item description of the parts (see image):
+                \begin{itemize}
+                    \item \code{Input Actions} : represents the logical actions the player can input
+                    \item \code{Mapping Context} : holds the keybinds for the Input Actions
+                    \item \code{Player Mappable Input Configs} : describes how the Mapping Context will show up in the options menu (description)
+                    \item \code{Input Config} : Binds an \code{Action} to an \code{Input Tag}
+                    \item \code{Input Tag} : is the binding piece to that links the input to the an Ability Set and thus activates Abilities
+                    \item \code{}
+                \end{itemize}
+            \end{itemize}
+            
+            \subsubsection{Workflow to add new Actions}
+                \begin{itemize}
+                    \item Create new \code{Action}
+                    \item Bind the Action inside the \code{Mapping Context}
+                    \item define what \code{Tag} will be triggered by the Action inside the \code{Input Config}
+                    \item associate the Tag with an \code{Ability Set} and a specific \code{Ability}
+                    \item 
+                \end{itemize}
+
+
+        \subsection{GameFeatures}
+            \begin{itemize}
+                \item the manually registered \code{HandlePawnExtension()}-function is registered as a manual extension handler
+                \item responds to different extensino events
+                \item \code{UGameFeatureAction_AddInputBinding}
+                \item \code{NAME_ExtensionRemoved} \& \code{NAME_ExtensionAdded} are called when the extension handler is first added or removed for all actors
+                \item responds to game-specific \code{NAME_BindInputsNow} event that is emitted by the \code{LyraHeroComponent}
+                \item 
+                \item \code{GetFeatureName} returns all feature names on the object
+                \item 
+                \item all Actors implement an \code{InitState}
+                \item used for later operations/querying
+                \item \code{GameFrameworkStateInterface} := simple framework for a simple C++ state machine
+                \item 
+            \end{itemize}
+
+    \section{Game Animation Sample (Motion Matching)}
+
+        
+
+        \begin{itemize}
+            \item have gait
+            \item character speed is mapped with a curve map
+            \item turn in place in ABP
+            \item movere will be in the future as the movement component
+        \end{itemize}
+
+
+
+        \subsection{Try Traversal}
+            \begin{enumerate}
+                \item depends on spline points placed on the obstacles $\rightarrow$ isn't fully dynmamic
+                \item 
+            \end{enumerate}
+            

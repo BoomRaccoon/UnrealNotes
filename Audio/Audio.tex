@@ -1,0 +1,132 @@
+\chapter{Audio}
+    \section{Basics}
+        \begin{itemize}
+            \item Sound Cue:
+            \item Sound Wave:
+            \begin{itemize}
+                \item sample sound data
+                \item codec can be specified on each sound wave
+                \item can be edited in the \code{Sound Wave Editor}
+            \end{itemize}
+            \item Sound Class:
+            \begin{itemize}
+                \item group together sound and apply effects for all
+                \item can have child classes
+                \item Sounds within a Sound Class can be sent to a Submix, which allows multiple sound types to be processed with submix effects at once
+            \end{itemize}
+            \item Meta Sound:
+            \begin{itemize}
+                \item 
+                \item synthesized sound
+            \end{itemize}
+            
+            \item Submix: 
+            \item Mixing: Group active so8und sources and apply effects to them
+            \item 
+            \item \code{Take Recorder}: you can use the Take Recorder to record audio from a microphone and synch it to the sequence asset
+            \item 
+            \item \code{Crossfade}: is used to transition smoothly between two audio sources
+            \item \code{Envelopes}: time based modulation
+            \item \code{Low Frequency Modulator (LFO)}: generate periodic signals
+            \item \code{Filters}: can be used to remove unwanted frequencies
+        \end{itemize}
+
+    \section{Sound classes}
+        \begin{itemize}
+            \item can have passive sound mix modifiers
+            \item if Audio Modulation plugin is installed:
+            \begin{itemize}
+                \item possible to add an array of Modulations Settings to all sounds within a Sound Class
+            \end{itemize} 
+        \end{itemize}
+
+    \section{Submixes}
+        \begin{itemize}
+            \item 
+            \item To mix audio generated from individual sources into a single output buffer
+            \item To optimize the application of digital signal processing (DSP) effects to multiple sound sources simultaneously
+        \end{itemize}
+
+    \section{Sound-classes vs submixes}
+        \begin{itemize}
+            \item submixes act on already mixed audio $\rightarrow$ cheaper to apply changes
+            \item sound-classes act on each source $\rightarrow$ expensive
+        \end{itemize}
+
+
+    \section{Meta Sounds}
+        \begin{itemize}
+            \item Output is by default Mono; can be changed in the Asset Properties
+            \item you can define extra inputs/outputs
+            \item set input: use nodes like \code{Set Float Parameter}
+            \item 
+            \item can be used to create procedural audio
+            \item \code{MetaSoundPatch}: is like a function library in order to use logic accross multiple MetaSoundAssets
+            \item coordinate playback of multiple sound assets
+            \item synthesize sound using sine, square, triangle, saw oscilator, noise, etc.
+            \item 
+            \item 
+            \item 
+            \item performance is better than sound waves
+            \item 
+            \item have a variable type \code{Trigger} == like a callback
+            \item can be fired while simulating
+            \item 
+            \item own effect nodes can be implemented in C++
+        \end{itemize}
+
+    \section{Debug Commands}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm} | p{12cm}}
+                \hline
+                    Command & Description \\
+                \hline
+                ShowSoundClassHierarchy & \makecell[l]{...} \\
+                ListSoundClassVolumes & \makecell[l]{...} \\
+                ListAudioComponents & \makecell[l]{...} \\
+                ListSoundDurations & \makecell[l]{...} \\
+                SoundTemplateInfo & \makecell[l]{...} \\
+                SetBaseSoundMix & \makecell[l]{...} \\
+                IsolateDryAudio & \makecell[l]{...} \\
+                IsolateReverb & \makecell[l]{...} \\
+                TestLPF & \makecell[l]{...} \\
+                TestHPF & \makecell[l]{...} \\
+                TestLFEBleed & \makecell[l]{...} \\
+                DisableLPF & \makecell[l]{...} \\
+                DisableHPF & \makecell[l]{...} \\
+                DisableRadio & \makecell[l]{...} \\
+                EnableRadio & \makecell[l]{...} \\
+                ResetSoundState & \makecell[l]{...} \\
+                ToggleSpatializationExtension & \makecell[l]{...} \\
+                EnableHRTFForAll & \makecell[l]{...} \\
+                Solo & \makecell[l]{...} \\
+                ClearSolo & \makecell[l]{...} \\
+                PlayAllPIEAudio & \makecell[l]{...} \\
+                Audio3dVisualize & \makecell[l]{...} \\
+                AudioMem & \makecell[l]{...} \\
+                AudioSoloSou & \makecell[l]{...} \\
+                AudioSoloSo & \makecell[l]{...} \\
+                AudioSoloS & \makecell[l]{...} \\
+                AudioMixerDeb & \makecell[l]{...} \\
+                SoundCla & \makecell[l]{...} \\
+                AudioDeb & \makecell[l]{...} \\
+                ResetAllDynamicSoundVolumes & \makecell[l]{...} \\
+                ResetDynamicSoundVolume & \makecell[l]{...} \\
+                GetDynamicSoundVolume & \makecell[l]{...} \\
+                SetDynamicSound & \makecell[l]{...} \\
+                GetAudioDeviceList & \makecell[l]{...} \\
+                
+
+                \hline
+            \end{tblr}
+        \end{table}
+        
+
+    \section{CPP}
+        \begin{itemize}
+            \item \code{FAudioDeviceManager} := class that manages the audio devices
+            \item \code{FAudioDeviceHandle} := strong handle to an audio device
+            \item 
+        \end{itemize}
+
+

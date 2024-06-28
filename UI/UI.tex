@@ -1,0 +1,415 @@
+\chapter{User Interface (UI)}
+    \section{General Notes(math)}
+            \subsection{Functions}
+                \subsubsection{Lerp}
+                    \begin{itemize}
+                        \item $Lerp(a, b, c) = result$
+                        \item \code{a} and \code{b} := values you want to blend between
+                        \item \code{c} :=  \colorbox{lightgray}{$c = 0 \Rightarrow result = a$} and \colorbox{lightgray}{$c = 1 \Rightarrow result = b$}
+                        \item returns := mix between the 2 values (is a mask if c is  ${N}=\{0,1\}$)
+                    \end{itemize}
+
+                \subsubsection{Inverse Lerp}
+                    \begin{itemize}
+                        \item can be used to clamp some values
+                        \item $InvLerp(a, b, c) = result$
+                    \end{itemize}
+
+
+                \subsubsection{Remap}
+                    \begin{itemize}
+                        \item is a combination of \code{Lerp} and \code{InvLerp}
+                        \item $Remap(iMin, iMax, oMin, oMax, c) = result$
+                        \item same as $InvLerp(iMin, iMax, value) = resulat1$ and then $Lerp(oMin, oMax, result1) = result2$
+                    \end{itemize}
+
+
+    \section{UI design}
+        \begin{itemize}
+            \item some general rules:
+            \begin{itemize}
+                \item rule of thirds := divide the screen into 3x3 parts and place important elements on the intersections
+            \end{itemize}
+        \end{itemize}
+                
+
+
+    \section{Resolution independent UI}
+        \begin{itemize}
+            \item start with resolution of 1920x1080 (<10\% of users have a resolution lower than that)
+            \item All text should be legible.
+            \item No UI elements should be overlapping.
+            \item No text should be breaking out of its containers.
+            \item Text should be tested with at least +30\% longer than the base English, to test localization.
+            \item 
+            \item easy resizing can be done with a \code{SizeBox} inside a \code{ScaleBox} 
+        \end{itemize}
+
+
+
+\uline{Add snapping to WrapBox inside of Scrollbox}
+\begin{lstlisting}
+InventoryScrollBox->OnUserScrolled.AddDynamic(this, &ThisClass::OnUserScrolled);
+
+void URPGInventoryPanelWidget::OnUserScrolled(float CurrentOffset)
+{
+    //Waits StopWheelDelay seconds to fire the OnMouseWheelStop function.
+    GetWorld()->GetTimerManager().ClearTimer(MouseWheelStopHandle);
+    GetWorld()->GetTimerManager().SetTimer(MouseWheelStopHandle, [this, CurrentOffset]()
+        {
+            OnMouseWheelStop(CurrentOffset);
+        }, StopWheelDelay, false);
+}
+
+void URPGInventoryPanelWidget::OnMouseWheelStop(float CurrentOffset)
+{
+    // Determine which item slot is at the top of the screen
+    int32 TopItemIndex = FMath::RoundToInt(CurrentOffset / ItemSlotHeight);
+
+    // Snap the scroll box to the top of the item slot at the top of the screen
+    float NewScrollOffset = TopItemIndex * ItemSlotHeight;
+
+    // Set the new scroll offset
+    InventoryScrollBox->SetScrollOffset(NewScrollOffset);
+}
+\end{lstlisting}
+\bigskip
+
+\chapter{UMG}
+    \subsection{General Notes}
+        \begin{itemize}
+            \item  settings for textures meant for UI := 
+            \begin{itemize}
+                \item \code{Level Of Detail} $\rightarrow$ Mip Gen Settings to \code{NoMipmaps}
+                \item \code{LOD Group} =  \code{UI}
+                \item \code{Compression Setting} = \code{TC Editor Icon}
+            \end{itemize}
+            \item performance tips:
+            \begin{itemize}
+                \item smaller widget tree $\rightarrow$ fewer function calls
+                \item flatter widget tree $\rightarrow$ less recursion
+                \item remove tick-function
+                \item use \code{Collapsed} instead of \code{Hidden}
+                \begin{itemize}
+                    \item \code{Visible} := will be rendered and can be interacted with
+                    \item \code{Hidden} := will not be rendered but can be interacted with (bindings are evaluated)
+                    \item \code{Collapsed} := will not be rendered and can not be interacted with (bindings aren't evaluated)
+                \end{itemize}
+            \end{itemize}
+        \end{itemize}
+
+        \uline{General-Workflow:}
+        \begin{itemize}
+            \item There should be
+            \begin{itemize}
+                \item Main Widget: is used as a container for smaller parts
+                \item User Created widgets: is a Category in the designer where you can add any other previously created Blueprint Widget
+            \end{itemize}
+        \end{itemize}
+        \includegraphics[width=\textwidth]{DrawHud.png} \\
+
+        \begin{figure}[!h]
+        \begin{minipage}{\textwidth}
+            \begingroup \parfillskip=0pt
+                    \minipage{\textwidth}
+                        \uline{ways to draw an image:}
+                        \begin{itemize}
+                            \item Box
+                            \item Border
+                            \item Image
+                        \end{itemize}
+                    \endminipage\hfill
+
+                    \minipage{0.3\textwidth}
+                        \includegraphics[width=\textwidth]{Bilder/9slice_box.png}
+                        \caption{9-Slice: Box}
+                    \endminipage\hfill
+                    \minipage{0.3\textwidth}
+                        \includegraphics[width=\textwidth]{Bilder/9slice_border.png}
+                        \caption{9-Slice: Border}
+                    \endminipage\hfill
+                    \minipage{0.3\textwidth}%
+                        \includegraphics[width=\textwidth]{Bilder/9slice_image.png}
+                        \caption{9-Slice: Image}
+                    \endminipage
+
+            \par\endgroup
+        \end{minipage}
+        \end{figure}
+        
+
+\smallskip
+\hypertarget{input:UI}{
+KeyPressed
+\begin{enumerate}
+\item Let Preprocessors try to handle it
+\item Run through the current focus list from root to outer most child to do Preview keys
+\item Run through current focus list from outer most child to root to process KeyDown events
+\item Pass input to the PlayerController. We're entirely done with UI now.
+\item PlayerController goes through it's own input stack and delegates events out to gameplay classes.
+\end{enumerate}
+}
+At any point, any one of those steps can consume input and stop the chain. This allows UI to not send input to game, a classic case is if you're typing in a  message box, you want to consume those controls so that they don't reach gameplay classes and move the character. \\
+\\
+CommonUI adds a new Preprocessor, and a new viewport client,
+which allows it to catch some specialized inputs for gamepads for UI,
+you can use these with any keys, but they're most useful for gamepads.
+This is all UI handling and works same as any other UI handling. \\
+\\
+
+EnhancedInput specifically overrides the PlayerController's InputComponent class. Which allows it to use the input it normally gets in differing ways, like the hold or tap effects. This is after UI inputs. \\
+\\
+This is the reason why these two are entirely compatible. They have literally no overlap. \\
+
+
+Locked just doesn't process the actual interaction
+So the click for example
+Lockable Widgets are also still visually pressable
+
+
+    \subsection{Specific Widget notes}
+        \subsubsection{RichText}
+            \begin{itemize}
+                \item Allows to format text
+                \item DataTable with RichTextStyle data type:= allows to specify different styles
+                \item $\hookrightarrow$ the name is used in the text like \code{<styleName>some text</>}
+                \item 
+                \item DataTable with RichImageRow data type := used to keep list of img that you want to use
+                \item $\hookrightarrow$ the name is used in text like \code{<img id="ImageRowName"/>}
+                \item 
+                \item decorator classes allow you to add generic things like images, Slate ... inline the text
+            \end{itemize}
+
+
+        \subsubsection{Editable Text}
+            \begin{itemize}
+                \item has a property called \code{}
+            \end{itemize}
+
+
+        \subsubsection{ListView}
+            \begin{itemize}
+                \item create a widget containing \code{ListView}
+                \item create a widget implmenting \code{UserObjectListEntry}-interface
+                \item in the widget with the interface, implement the \code{OnListItemObjectSet} function
+                \item 
+                \item assign the widget with the interface to \code{Entry Widget Class} in the ListView
+                \item use the \code{Set List Items} or \code{Add Item} functions to set/add the items (this will call the \code{OnListItemObjectSet}-function for each item)
+            \end{itemize}
+
+            
+    \section{CommonUI}
+
+        \begin{itemize}
+            \item CommonInputActionDataBase: contains UIInputActions with their keys, names, description and icons
+            \item CommonActivatableWidget: is a Widget-BP that can be activated and diactivated. so the top Widget will get focus
+            \item CommonInputBaseControllerData: to display Icons for Widgets
+            \item CommonUIInputData: universal Confirm/Back button setup
+            \item 
+            \item CommonActivableWidgetStack: gives automatic focusing and has only one active widget at a time
+            \item removing widget from UI := will always deactive (even when destroyed); re-constructing just activates it (\code{auto-activate} is enabled)
+            \item auto-activate := will activate the widget if it has been deactivated before
+            \item 
+            \item FInputMappingContextAndPriority % TODO: get more infos
+        \end{itemize}
+
+        Controller Data Info assets defining icon sets for your controllers, plugged into
+        Project Settings > Game > Common Input Settings > Controller Data \\
+        Gamepad must have the correct name ("Generic") \\
+
+        \subsection{CommonUI with Enhanced Input}
+            \begin{itemize}
+                \item 
+                \item \code{UCommonInputMetadata} :=
+                \begin{itemize}
+                    \item Inherit from this class for per platform info used by CommonUI
+                    \item IMC's can be specified per platform, so each platform may have different Common Input Metadata
+                \end{itemize}  
+            
+                \item \code{bool bIsGenericInputAction} := 
+                \begin{itemize}
+                    \item \code{Generic} actions (like accept or face button top) will be subscribed to by multiple UI elements. 
+                    \item These actions will not broadcast enhanced input action delegates
+                    \item 
+                    \item \code{Non-generic} actions will fire Enhanced Input events 
+                    \item will not fire CommonUI action bindings (Since those can be manually fired in BP).
+                \end{itemize}
+                \item 
+            \end{itemize}
+
+
+    \subsection{Overview of widgets}
+            \begin{table}[!htb]
+                \begin{tblr}{p{6cm} | p{12cm}}
+                    \hline
+                    Widget & Description \\
+                    \hline
+                    CommonWidgetStack & used when you want to push/pop widgets \\
+                    Common Lazy Image & loads images asynchronously and hides loading with throbber \\
+                    \hline
+                \end{tblr}
+                \caption{ caption }
+            \end{table}
+
+            extra info on Common Lazy Image: \\
+            Streaming textures refers to textures that have mips, and therefore, allow for some or all of the mips to be loaded at any given time.  Depending upon texel density on screen, the renderer can attempt to 'stream' more mips off disk and into memory for the GPU.
+            \\
+            Virtual Textures are large textures on disk, that utilize GPU readbacks to determine if subsections of the large texture is visible, if so, they read in small chunks of texture into a Virtual texture atlas on the GPU - that enables very high details, without high memory overhead, because only the visible chunks are in memory - and also I think lowest mip level of the virtual texture also stays in memory.
+            \\
+            Non-Streaming textures, textures without mips (by which i mean they have only 1 - the highest), or those with mips that are marked as never stream, are always resident on the GPU when loaded.  They subtract from the total streaming pool because as mentioned they have no mips or are marked as never stream, so they can not be reduced from the pool until the UTexture is actually unloaded from memory.
+            \\
+            CommonLazyImage cares about none of this - it's one and only job is to hide the diskload hitch that would accompany a synchronus asset load for an image - by putting it behind an async load and a loading progress material
+
+
+            
+    \section{MVVM (Model-View-Model-View)}
+        \subsection{workflow}
+        \begin{itemize}
+            \item enable MVVM plugin
+            \item create blueprint \code{MVVMViewModelBase}
+            \item add all the variables it needs
+            \item mark them \code{FieldNotify}
+            \item 
+            \item construct the Viewmodel in some place \code{Construct ...}
+            \item add it to the View-Model-Collection in the VMSubsystem \code{Add View Model Instance}
+        \end{itemize}
+            
+            
+            
+    
+    \section{Drag \& Drop}
+        \begin{itemize}
+            \item Create widget and override \code{OnMouseButtonDown}
+            \item use node \code{Detect Drag if Pressed} use \code{Mouse Event} for the \code{Pointer Event}-input and LC as the \code{Drag Key}
+            \item  
+            \item override \code{OnDragDetected}
+            \item use node \code{create Drag \& Drop operation}
+            \item 
+            \item another created widget overrides the \code{OnDrop}-function
+            \item 
+            \item the \code{On Drop Cancelled}-function will be fired if it's not droppepd on anything that accepts OnDrop
+            \item 
+            \item \textbf{extra information}: can be passed by creating a \code{Drag and drop operation} and adding variables to it
+        \end{itemize}
+
+            
+    \section{Game Settings (Plugin)}            
+        \begin{itemize}
+            \item GameSettingsCollection := holds multiple settings that should be grouped together (video, audio ...)
+            \item can be defined in .cpp files only
+            \item 
+            \item GameSettingsRegistry := holds the collections
+        \end{itemize}
+
+        \subsection{Setting up config files}
+            \begin{itemize}
+                \item change the GameSettingsClass and LocalPlayerClass using the \code{DefaultEngine.ini}
+            \end{itemize}
+            
+\begin{lstlisting}
+GameUserSettingsClassName=/Script/YOUR_PROJECT_NAME.YOUR_CUSTOM_CLASS
+LocalPlayerClassName=/Script/YOUR_PROJECT_NAME.YOUR_CUSTOM_CLASS
+\end{lstlisting}
+        
+        \subsection{Setting up a collection}
+            \begin{itemize}
+                \item create new collection := \code{UGameSettingCollection* Graphics = NewObject<UGameSettingCollection>();}
+                \item set (internal)Name and DisplayName:
+                \begin{itemize}
+                    \item \code{Graphics->SetDevName(TEXT("GraphicsCollection"));}
+                    \item \code{Graphics->SetDisplayName(LOCTEXT("GraphicsCollection_Name", "Graphics"));}
+                \end{itemize}
+            \end{itemize}
+        
+        
+        \subsection{Basic setup and code execution}
+            \uline{Widgets to create:}
+            \begin{itemize}
+                \item GameSettingsScreen
+                \item GameSettingsPanel
+                \item Widget derived from \code{UCommonTabListWidgetBase}
+            \end{itemize}
+        
+            \begin{figure}
+                \includegraphics[width=\textwidth]{GameSettingsSreenHierarchy.png}
+                \caption{Widget Hierarchy of the GameSettingsScreen}
+                \label{}
+            \end{figure}
+
+            \begin{itemize}
+                \item First: \code{SettingScreen} $\rightarrow$ \code{RegisterSettingsTab}
+                \item \code{RegisterTab} $\rightarrow$ will create a specified button 
+            \end{itemize}
+            
+            \begin{figure}
+                \includegraphics[width=\textwidth]{RegisterSettingsTab.png}
+                \caption{Tab registration setup}
+                \label{}
+            \end{figure}
+        
+        SettingScreen::RegisterTab -> get The SettingCollection from the SettingsCollection::DevName (SettingSreen::)
+        
+        LyraTabListWidget(that is inside the SettingScreen)::RegisterDynamicTab(C++) !!! this does actually register the settingCollection
+        everything before is just fluff
+        
+        TabListWidget::RegisterDynamicTab -> UCommonTabListWidgetBase::RegisterTab
+        
+        TabListWidget::HandleTabCreation := takes the tab name ID and a widget
+        TabListWidget::HandleTabCreation->TabListWidget::UpdateTabStyles
+        TabListWidget::UpdateTabStyles := sets widget as child of horizontalBox (HorizontalBox::AddChildToHorizontalBox), sets padding (HorizontalBoxSlot::SetPadding), sets minimum dimension (CommonButtonBase::SetMinDimensions)
+        Refresh Next/Previous (actionButtons visibility)
+        
+        there is a Buttonstyle specified inside the TabListWidget (that holds the buttonTabs) that can be used to style all buttons on updateTabStyles
+        
+\chapter{Slate}
+
+    \section{General Notes}
+        \begin{enumerate}
+            \item Slate uses the \glsdesc{CRTP}
+            \item \code{.Pin} return a shared pointer from a weak pointer
+            \item if you want have an SVerticalBox, say, and that inherits from SBox, it will returns SVerticalBox as its type name, so checking if it's typename is SBox will fail, even though it's a valid cast.
+            If you want to use the Cast-like method, the widget itself must have SLATE\_DECLARE\_WIDGET or SLATE\_IMPLEMENT\_WIDGET in its header.
+            \item void Construct(FArguments Args (or whatever it's called), Type1 Arg1, Type2 Arg2)
+            SNew(YourType, Arg1, Arg2) 
+            Personally I like to make mandatory parameters as construct arguments and anything optional as slate\_argument/attributes/etc. 
+            
+        \end{enumerate}
+
+    \section{Types}
+        \begin{itemize}
+            \item \code{FLayout} : contains Areas and Layouts
+            \item \code{FArea} : 
+            \item \code{FSplitter} : 
+        \end{itemize}
+
+    
+    \section{Custom Slate Widget}
+        \begin{enumerate}
+            \item Create a new class that inherits from \code{SCompoundWidget}
+            \item Add the slate macros
+            \item add the \code{Construct(const FArguments& InArgs)}-function
+            \item add widgets to the \code{ChildSlot} member
+            \item 
+            \item access arguments: \code{InArgs._YourArgument}
+        \end{enumerate}
+
+        \begin{lstlisting}
+            ChildSlot
+        .HAlign( InArgs._HAlign )
+        .VAlign( InArgs._VAlign )
+        .Padding( InArgs._Padding )
+        [
+            InArgs._Content.Widget
+        ];
+        \end{lstlisting}
+
+
+    \section{Useful code}
+\begin{lstlisting}
+SetGroup(FToolExampleEditor::Get().GetMenuRoot())
+\end{lstlisting}
+
+\begin{lstlisting}
+FGlobalTabmanager::Get()->RegisterNomadTabSpawner(TabName, FOnSpawnTab::CreateRaw(this, &FExampleTabToolBase::SpawnTab));
+\end{lstlisting}
+

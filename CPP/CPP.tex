@@ -1,0 +1,1087 @@
+\chapter{C++}
+
+    \section{Unsorted}
+
+
+    \begin{itemize}
+        \item disable optimisation for a specific file \\ \code{#pragma message("*****Optimisation disabled on " __FILE__) PRAGMA_DISABLE_OPTIMIZATION}
+        \item $\hookrightarrow$ and disable \code{unity build} in \code{.build.cs} with \code{bUseUnity = false;}
+        \item 
+        \item the FSlateApplication tracks a LastUserInteractionTime double property for any input to the application
+        \item \code{TObjectPtr} can just be replaced with rawPointer
+        \item Block-Comments above \code{UCLASS/UPROPERTY} will create documentation in the editor
+        \item 
+        \item \code{AddUObject} vs \code{AddUFunction} add uobject is a native delegate binding that works similar to add static, except checks for object alive first
+        add ufunction uses reflection to invoke it and is thus extremely slow
+        \item \code{OnConstruction} is called after \code{AActor::UserConstructionScript} is run first
+        \item 
+        \item code you need to include engine modules \code{System.IO.Path.GetFullPath(Target.RelativeEnginePath) + "Source\\Editor\\Blutility\\Private"}
+        \item 
+        \item \code{TSharedFromThis} is required to use \code{SharedThis} or \code{AsShared()}, but you can also use \code{MakeShareable} for a type that doesn't use it 
+                \code{MakeShared} creates a new reference counter
+                \code{MakeShareable} does not
+        \item can't use UPROPERTY in MACROS
+    \end{itemize}
+
+    \uline{Iterate over all UFUNCTIONs}
+    \begin{lstlisting}
+TFieldIterator<UFunction>
+
+for ( TFieldIterator<UFunction> FuncIt(FromClass, EFieldIteratorFlags::IncludeSuper); FuncIt; ++FuncIt )
+
+
+
+USTRUCT(BlueprintType)
+struct FCppPostStruct
+{
+	GENERATED_BODY()
+
+    UPROPERTY()
+	int32 userId;
+
+    UPROPERTY()
+	int32 id;
+
+    UPROPERTY()
+	FString title;
+    
+    UPROPERTY()
+	FString body;
+};
+
+FCppPostStruct* test = new FCppPostStruct();
+test->id = 0;
+test->userId = 0;
+test->title = "hello";
+test->body = "world";
+
+for (TFieldIterator<UProperty> It(test->StaticStruct()); It; ++It)
+{
+	UProperty* Property = *It;
+	FString VariableName = Property->GetName();
+}
+
+    \end{lstlisting}
+
+    \uline{Notes}
+    \begin{itemize}
+        \item Or often TDelegate<void()> (void is the return type, and you can specify the params in the parentheses)
+        \item Multicast just means it holds an array of delegates, multiple delegates bound to different functions and objects
+        \item Dynamic are also quite a bit slower
+    \end{itemize}
+
+
+    \begin{lstlisting}
+    UClass* Class = GetClass();
+    const bool bIsBlueprint = Class->bGeneratedBy;
+    if (!bIsBlueprint) return;
+    for (TFieldIterator<FProperty> PropertyIterator(this->GetClass()); PropertyIterator; ++PropertyIterator)
+    {
+    }
+    \end{lstlisting}
+    use Property->ContainerPtrToValuePtr, pass the object instace to its params
+    UClass is shared between same archetypes
+    but ContainerPtrToValuePtr gives you the correct variable from the Uobject passed to it
+
+
+    \begin{lstlisting}
+    GameplayTagEditorModule::AddNewGameplayTagToINI <.>
+    \end{lstlisting}
+
+    \uline{Possess on server}
+        \begin{lstlisting}
+    PossessedBy() // on server
+    APlayerController::AcknowledgePossession() // on client
+    OnRep::Controller // any
+    APawn::Restart // IDK
+        \end{lstlisting}
+
+
+    \uline{Possess on Client}
+        \begin{lstlisting}
+        \end{lstlisting}
+
+    \section{Snippets of info}
+    \uline{Force Garbage Collection}
+    \begin{lstlisting}
+GetWorld()->ForceGarbageCollection( true );
+    \end{lstlisting}
+
+        \uline{CreateDefaultSubobject vs NewObject}
+            \begin{itemize}
+                \item \code{CreateDefaultSubobject}
+                \begin{itemize}
+                    \item can ONLY be called in constructor
+                \end{itemize}
+            \end{itemize}
+            \begin{itemize}
+                \item \code{NewObject}
+                \begin{itemize}
+                    \item can be called outside constructor
+                \end{itemize}
+            \end{itemize}
+
+        \uline{TSoftObjPtr TWeakObjPtr}
+        \begin{itemize}
+            \item \code{TSoftObjPtr}
+            \begin{itemize}
+                \item if you want to control when something is loaded
+                \item you can decide when to load
+                \item == TWeakObjPtr with a path
+            \end{itemize}
+        \end{itemize}
+
+        \begin{itemize}
+            \item \code{TWeakObjPtr}
+            \begin{itemize}
+                \item if you want to reference something and not keep it alive for GC
+            \end{itemize}
+        \end{itemize}
+
+        \uline{OnPossess before BeginPlay}
+            \begin{itemize}
+                \item \code{OnPossess} will be executed even before the \code{BeginPlay}
+            \end{itemize}
+
+
+    \section{Naming Conventions}
+        \begin{itemize}
+            \item Types := are nouns
+            \item Methods := are verbs or describe return value of a method that has no effect
+            \item IsVisible/ShouldClearBuffer := Functions returning booleans
+            \item Procedure should use a strong verb followed by an object
+            \item Out := Parameters passed by reference and changed inside function
+            \item const := marked pointer or reference arguments that will not be changed inside / methods !modify the object
+        \end{itemize}
+        \uline{Examples}
+        \begin{itemize}
+            \item float TeaWeight;
+            \item int32 TeaCount;
+            \item bool bDoesTeaStink;
+            \item FName TeaName;
+            \item FString TeaFriendlyName;
+            \item UClass* TeaClass;
+            \item USoundCue* TeaSound;
+            \item UTexture* TeaTexture;
+        \end{itemize}
+    \smallskip
+        \uline{Type Names:}
+        \begin{itemize}
+            \item U := UObject
+            \item A := AActor
+            \item S := SWidget
+            \item I := Abstract Interfaces
+            \item E := Enums
+            \item b := Boolean
+            \item F := most other classes
+        \end{itemize}
+        
+\bigskip
+
+        \uline{Engine Structure for modules (Engine/Source)}
+        \begin{itemize}
+            \item Developer: for any application but used during development only
+            \item Editor: for use in unreal Editor
+            \item Runtime: for any application at any time
+            \item ThirdParty: code and libraries from external third parties
+        \end{itemize}
+
+    \section{Smart Pointers}
+    \href{https://docs.unrealengine.com/5.0/en-US/smart-pointers-in-unreal-engine/}{off. Doc}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm}|p{12cm}}
+                \hline
+                    Pointer Type & Properties \\
+                \hline
+                    Shared Pointer (TSharedPtr) & {owns the object it references \\ prevents deletion of the object \\ nullable} \\
+                    Shared Reference (TSharedRef) & {owns the object it references \\ non-nullable -> ensures valid object} \\
+                    Weak Pointer (TWeakPtr) & {don't own the object \\ do not increase ref count \\ nullable} \\
+                    Unique Pointer (TUniquePtr) & {is the only pointer that owns an object \\ can transfer ownership \\ cannot share ownership \\ will delete referenced object when pointer gets out of scope} \\
+                \hline
+            \end{tblr}
+        \caption{ caption }  
+        \end{table}
+
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm}|p{12cm}}
+                \hline
+                    Helper Class/Function & Description \\
+                \hline
+                    : public TSharedFromThis & Class that derives from TSharedFromThis adds the AsShared SharedThis functions -> enables you to acquire a TSharedRef to your object \\
+                    MakeShared / MakeShareable & {creates a shared pointer from a raw C++ pointer \\ MakeShared allocates a new object instance and the reference controller in a single memory block but requires the object to have a public constructor \\ MakeShareable works on private constructors, lets you take ownership \\ supports customized behaviour when deleting the object} \\
+                    {StaticCastSharedRef \\ StaticCastSharedPtr} & typically used to downcast to a derived type \\
+                    {ConstCastSharedRef \\ ConstCastSharedPtr} & converts a const SmartRef to a mutable SmartRef / SmartPtr \\
+                \hline
+            \end{tblr}
+        \caption{ caption }  
+        \end{table}
+        Up-casting is implicit. \code{StaticCastSharedPtr} to downcast to a derived class
+        \begin{lstlisting}
+    // This assumes we validated that the FDragDropOperation is actually an FAssetDragDropOp through other means.
+    TSharedPtr<FDragDropOperation> Operation = DragDropEvent.GetOperation();
+    // We can now cast with StaticCastSharedPtr.
+    TSharedPtr<FAssetDragDropOp> DragDropOp = StaticCastSharedPtr<FAssetDragDropOp>(Operation);
+        \end{lstlisting}
+
+    \section{Important Modules}
+        \begin{itemize}
+            \item \uline{\textbf{Core:}}
+            \begin{itemize}
+                \item basic framework for unreal modules to communicate
+                \item standard set of types (math library, container library, HAL library)
+            \end{itemize}
+            \item \uline{\textbf{CoreUObject:}} defines UObject
+            \item \uline{\textbf{Engine:}}
+            \begin{itemize}
+                \item contains functionality associate with a game (game world, actors, characters)
+                \item Actor, Pawn, Controller, Components, Gameplay, Assets
+            \end{itemize}
+            \item \uline{\textbf{Toolkits:}}
+            \begin{itemize}
+                \item FAssetEditorToolkit: base class for toolkits that are used for asset editing
+            \end{itemize}
+        \end{itemize}
+
+    \section{Unreal Types}
+        \begin{itemize}
+            \item ANSICHAR
+            \item FVector
+            \item FRotator
+            \item FTransform
+            \item FMatrix
+            \item FArchive
+            \item FOutputDevice
+            \item 
+            \item Text-Types:
+            \begin{itemize}
+                \item FString :=
+                \begin{itemize}
+                    \item mutable, created with \colorbox{mygray}{\lstinline{FString MyStr = TEXT("Hello, Unreal 4!")}}, lots of methods to enhance usability \href{https://docs.unrealengine.com/en-US/API/Runtime/Core/Containers/FString}{off. Docs} (16 Bytes)
+                    \item FString objects store their own character arrays, while FName and FText objects store an index to a shared character array, and can establish equality based purely on this index value
+                \end{itemize} 
+                \item \code{FText} := meant for localization \href{https://docs.unrealengine.com/en-US/API/Runtime/Core/Internationalization/FText}{off. Docs}
+                \item \code{FName} := stores strings as an identifier and thus saves memory (8 Bytes)
+                \item \code{TCHAR} := ==\code{wchar_t} \href{https://docs.unrealengine.com/en-US/API/Runtime/Core/Misc/TChar}{off. Docs}
+                \item \href{https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/StringHandling/}{further Information}
+            \end{itemize}
+            \item 
+            \item Container \href{https://www.unrealengine.com/en-US/blog/ue4-libraries-you-should-know-about}{more info}
+            \begin{itemize}
+                \item TArray
+                \begin{itemize}
+                    \item dynamically resizible array
+                    \item holds ptr to objects by default
+                    \item can be any Type ex. \colorbox{mygray}{\lstinline{TArray<FVector>}}
+                \end{itemize}
+                \item TSet := like Array but unique
+                \item TList
+                \item TMap := key-value eg.: \colorbox{mygray}{\lstinline{TMap<FIntPoint, FPiece> Data}}
+            \end{itemize}
+            \item iterator $\rightarrow$ \colorbox{mygray}{\lstinline{for (auto EnemyIterator =a EnemySet.CreateIterator(); EnemyIterator; ++EnemyIterator)}}
+            \item for-each $\rightarrow$ \colorbox{mygray}{\lstinline{for (AActor* OneActor : ActorArray)}} (TMap return key-value-pair)
+            \item integers
+            \begin{itemize}
+                \item int8 / uint8
+                \item int16 / uint16
+                \item int32 / uint32
+                \item int64 / uint64
+            \end{itemize}
+        \end{itemize}
+            \subsection{Name vs Text vs String}:
+            \begin{itemize}
+                \item FName: 
+                \begin{itemize}
+                    \item simplest way to work with characters in a data table with fast key lookup
+                    \item case insensitive
+                    \item immutable
+                    \item \href{https://docs.unrealengine.com/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/StringHandling/FName/index.html}{more}
+                    \item \code{EName} is an enum that holds indecis to entries in the FName table
+                \end{itemize}
+                \item FText:
+                \begin{itemize}
+                    \item All user-facing text should use
+                    \item supports text localization
+                    \item supports formatting
+                    \item generate text from dates and times
+                    \item text from numbers
+                    \item \href{https://docs.unrealengine.com/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/StringHandling/FText/index.html}{more}
+                \end{itemize}
+                \item FString:
+                \begin{itemize}
+                    \item only one that is mutable
+                    \item $\rightarrow$ can be searched, modified and compared
+                    \item \href{https://docs.unrealengine.com/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/StringHandling/FString/index.html}{more}
+                \end{itemize}
+                \item \href{https://docs.unrealengine.com/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/StringHandling/index.html}{Conversions}
+            \end{itemize}
+
+            \subsection{Localization}
+                \begin{itemize}
+                    \item Macros:
+                    \begin{itemize}
+                        \item \code{NSLOCTEXT} := 
+                        \item \code{LOCTEXT(key, sourceString)} := localized piece of text;  namespace has to be defined with \code{#define LOCTEXT_NAMESPACE "nameSpace"}
+                    \end{itemize}
+                    \item String Tables can be referenced in C++ using either the LOCTABLE macro, or the static FText::FromStringTable function. The underlying logic is identical, although the macro is easier to type but will only work with literal values, whereas the function will work with both literal and variable arguments. 
+                    \item 
+                \end{itemize}
+
+    \section{Classes provided by the engine}
+        \subsection{UObject}
+            \begin{itemize}
+                \item IS THE BASE BUILDING BLOCK
+                \item UClass \& UObject together are root for everything that a gameplay object does during lifetime
+                \item provides:
+                \begin{itemize}
+                    \item reflection of properties and methods
+                    \item serialization of properties
+                    \item garbage collection
+                    \item finding a UObject by name
+                    \item configurable values for properties
+                    \item Type information available at runtime 
+                    \item Automatic updating of default property changes
+                    \item Automatic property initialization
+                    \item Automatic editor integration
+                    \item networking support
+                \end{itemize}
+                \item a UClass singleton is created for every class that derives from UObject, containing all the metadata about the class instance
+            \end{itemize}
+            \uline{\textbf{Interate over all UObjects and Children}}
+            \begin{lstlisting}
+    // Will find ALL current UObject instances
+    // or specify a different class
+    for (TObjectIterator<UObject> It; It; ++It)
+    {
+        UObject* CurrentObject = *It;
+        UE_LOG(LogTemp, Log, TEXT("Found UObject named: %s"), *CurrentObject->GetName());
+    }
+            \end{lstlisting}
+
+        \subsection{AActor}
+            \href{https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/ProgrammingWithCPP/UnrealArchitecture/Actors/}{off. Docs}
+            \begin{itemize}
+                \item AActor : UObject
+                \item all objects that can be placed in a level derive from AActor
+                \item 
+            \end{itemize}
+
+            \uline{\textbf{Iterate over all Actors and Children}}
+            \begin{lstlisting}
+    //Get the current World-instance with the PlayerController
+    UWorld* World = MyPC->GetWorld();
+    // Like object iterators, you can provide a specific class to get only objects that are
+    // or derive from that class
+    for (TActorIterator<AEnemy> It(World); It; ++It)
+    {
+        // ...
+    }
+            \end{lstlisting}
+
+
+        \subsection{UActorComponent}
+            \begin{itemize}
+                \item contains the individual tasks of an actor:
+                \begin{itemize}
+                    \item particle effects
+                    \item sounds
+                    \item visual mesh
+                    \item physics interaction
+                    \item \code{meta=(BlueprintSpawnableComponent)} to make it possible to add it to actors
+                \end{itemize}
+                \item ticked as part of the owning Actors tick $\rightarrow$ call Super::Tick in the component
+            \end{itemize}
+
+        \uline{Movement and MovementComponents}
+        \begin{itemize}
+            \item any movement makes use of the MovementComponent
+        \end{itemize}
+
+        \uline{ProjectileMovementComponent}
+            \begin{itemize}
+                \item updates the position of another compoment every tick
+                \item usually root component of the owning actor is moved but can be changed
+            \end{itemize}
+
+        \uline{RotatingMovementComponent}
+            \begin{itemize}
+                \item performs continuous rotation of a component
+                \item special values like: pivot point, rotation rate
+                \item no collision testing
+            \end{itemize}
+
+        \uline{CharacterMovementComponent}
+            \begin{itemize}
+                \item adds movement modes like walking, running, jumping, flying, falling, and swimming
+                \item modes have special values to alter the behaviour like falling and walking friction, speeds for travel through air and water and across land, buoyancy, gravity scale, and the physics forces
+                \item 
+            \end{itemize}
+        
+    \section{Metadata Specifier}
+        Specifies the behaviour when declaring something. \\
+        \begin{itemize}
+            \item UPROPERTY
+            \item UFUNCTION
+            \item UINTERFACE
+            \item UCLASS
+            \item USTRUCT
+            \item UENUM
+        \end{itemize}
+
+        \subsection{UPROPERTY}
+            Will include the porperty to the garbage collection and set some porperties
+            \begin{itemize}
+                \item Visibility: EditAnywhere, BlueprintReadWrite, BlueprintReadOnly, BlueprintCallable, 
+                \item Transient := it will not be saved on disk and a value that is derived (eg. damagePerSecond = damage/damgeInSeconds)
+                \item BlueprintImplementableEvent := so you can define the actual behaviour in the blueprint/LevelBlueprint (it's an event)
+                \item BlueprintNativeEvent := designed to be overriden by BP but also has a default native implementation named '[FUNCTIONNAME]\_Implementation'
+                \item Meta specifier:
+                \begin{itemize}
+                    \item meta = (MakeEditWidget = "true") := 
+                \end{itemize}
+                \item values can be edited after they are initialized with the constructor with \colorbox{mygray}{\lstinline{void AMyActor::PostInitProperties(){ }}}
+                \item anything not designed for the packed game should be inside of \colorbox{mygray}{\lstinline{#if WITH_EDITOR ... #endif}}
+            \end{itemize}
+
+            \uline{Make Variable available from BPs}
+            \begin{lstlisting}
+    UPROPERTY(BlueprintReadWrite)
+            \end{lstlisting}
+\smallskip
+            \uline{Variable can be seen everywhere}
+            \begin{lstlisting}
+    UPROPERTY(VisibleAnywhere)
+            \end{lstlisting}
+
+        \subsection{UFUNCTION}
+            \uline{Make Function callable from BPs}
+            \begin{lstlisting}
+    UFUNCTION(BlueprintCallable)
+            \end{lstlisting}
+\smallskip
+            \uline{Function that can be implemented through BPs but otherwise executes the CPP implementation}
+            \begin{lstlisting}
+    /** CPP-File */
+    UFUNCTION(BlueprintNativeEvent)
+    void SpawnOurPawn(UClass* ToSpawn, const FVector& Location);
+    /** the CPP implementation needs the _IMPLEMENTATION suffix
+    if BP implements the function, CPP needs to be called manually
+    by calling the parent function
+    */
+    void ASpawnActor::SpawnOurPawn_Implementation(UClass* ToSpawn, const FVector& Location)
+    /** and the PARENT function has to be called in the BP in order to execute CPP */
+            \end{lstlisting}
+
+        \subsection{UCLASS}
+            \begin{itemize}
+                \item Abstract: prevents from adding Actors of this class in the level
+                \item Blueprintable: allow user to create Blueprints that derive from this class
+                \item BlueprintType: expose the class as a type that can be used for variables in Blueprints
+                \item Metadata Specifiers:
+                \begin{itemize}
+                    \item \colorbox{mygray}{\lstinline{[Short]ToolTip=""}} : will override the automatically generated tooltip (created from code comments)
+                    \item \colorbox{mygray}{\lstinline{ChildCanTick/ChildCannotTick}}
+                \end{itemize}
+            \end{itemize}
+            \href{https://docs.unrealengine.com/en-US/Programming/UnrealArchitecture/Reference/Classes/Specifiers/index.html}{Complete list}
+
+
+        \subsection{UENUM}
+            \begin{enumerate}
+                \item BlueprintType: makes the enum available in Blueprints
+                \item Meta: can be used to add metadata to the enum
+                \item DisplayName: changes the name of the enum in the editor
+                \item ToolTip: adds a tooltip to the enum
+                \item switch case: each case must be like \code{case EnumName::CaseName}
+            \end{enumerate}
+
+    \section{Top functions\&Variables for classes}
+        \subsection{Pawn}
+            \uline{Variables}
+            \begin{itemize}
+                \item AutoPossesPlayer
+                \item AutoPossesAI
+                \item bUseControllerRotationPitch, bUseControllerRotationYaw, bUseControllerRotationRoll
+                \item Controller
+                \item LastHitBy
+            \end{itemize}
+\smallskip
+            \uline{Functions}
+            \begin{itemize}
+                \item GetVelocity()
+                \item AddMovementInput()
+                \item ConsumeMovementInputVector()
+                \item CreatePlayerInputComponent()
+                \item DestroyPlayerInputComponent()
+                \item GetBaseAimRotation
+                \item GetController
+            \end{itemize}
+\smallskip
+
+\smallskip
+    
+\smallskip
+    
+    \section{Components}
+        \uline{Major classes:}
+        \begin{itemize}
+            \item Actor Components/UActorComponent: for abstract behavior like movement, inventory, attribute managment ...
+            \item Scene Components/USceneComponent (child of UActorComponent): supports location-based behavior wihtout a geometric representation.
+            \item Primitive Components/UPrimitiveComponent (child of USceneComponent):  location-based behavior with geometric representation $\rightarrow$ static/skeletal mesh, sprites/billboards, particle systems ...
+        \end{itemize}
+        \uline{Examples}
+        \begin{itemize}
+            \item UCameraComponent
+            \item USpringArmComponent
+            \item UBoxComponent
+            \item UStaticMeshComponent
+            \item ...
+        \end{itemize}
+        \uline{No ticking unless:}
+        \begin{itemize}
+            \item 1. set \code{PrimaryComponentTick.bCanEverTick = true}
+            \item 2. call \code{PrimaryComponentTick.SetTickFunctionEnable(true)}
+            \item (3. disable it) \code{PrimaryComponentTick.SetTickFunctionEnable(false)}
+        \end{itemize}
+
+    \section{Adding additional things into automatically added header files}
+        \begin{itemize}
+            \item open: \code{[ProjectName].Build.cs}
+            \item public dependency names in \code{PublicDependenyModuleNames.AddRange} are \code{\"Core\", \"CoreUObject\", \"Engine\", \"InputCore\"}
+            \item add things you want to be included and useable by other modules ie: \code{\"UMG\", \"EnhancedInput\"}
+            \item and to 'PrivateDependencyModuleNames.AddRange' to be only useable in current module ie.: \code{\"Slate\", \"SlateCore\"}
+        \end{itemize}
+
+\bigskip
+
+    \section{Deleting CPP Classes}
+        If you want to delete a class you have to go into the .
+        \begin{itemize}
+            \item delete the cpp and h file of the class in the folder 'Source' of the Project
+            \item delete 'Binaries' in the project folder
+            \item and rebuild the project
+        \end{itemize}
+
+    \section{Gameplay tags}
+        \begin{itemize}
+            \item are used for nested functionallity like DamgeTypes, 
+            \item can be set in \code{GameName/Config/DefaultGameplayTags.ini}
+            \item can be set in \code{GameName/Config/Tags}
+            \item can be set through DataTables of the type GameplayTagTableRow
+            \item 
+            \item are added to blueprints or native types as GameplayTag or GameplayTagContainer
+            \item 
+            \item Container.HasTagExact() returns:
+            \begin{itemize}
+                \item “Weapon.Melee”
+                \item ”Spell.Fireball” 
+            \end{itemize}
+            \item Container.HasTag() return:
+            \begin{itemize}
+                \item “Weapon”
+                \item “Weapon.Melee” 
+                \item “Spell” 
+                \item “Spell.Fireball”
+            \end{itemize} 
+        \end{itemize}
+
+    \section{Memory Managed Object instances(NewObject SpawnActor)}
+        Creating an UObject instance is done using
+        \begin{lstlisting}
+    NewObject< >
+        \end{lstlisting}
+        Creating an UActor instance is done using
+        \begin{lstlisting}
+    SpawnActor< >
+        \end{lstlisting}
+
+    \section{Subsystems}
+        \glsdesc{Subsystem}
+        Is a way to extend Engine-Classes while avoiding to override them \\
+        \uline{Currently supported subsystems}
+        \begin{itemize}
+            \item UEngineSubsystem: Access through \code{UMyEngineSubsystem* MySubsystem = GEngine->GetEngineSubsystem<UMyEngineSubsystem>();}
+            \item \code{UEditorSubsystem} : Access through \code{UMyEditorSubsystem* MySubsystem = GEditor->GetEditorSubsystem<UMyEditorSubsystem>();}
+            \item \code{UGameInstanceSubsystem} Access through \code{UGameInstance* GameInstance = ...; UMyGameSubsystem* MySubsystem = GameInstance->GetSubsystem<UMyGameSubsystem>();}
+            \item \code{ULocalPlayerSubsystem} Access through \code{ULocalPlayer* LocalPlayer = ...; UMyPlayerSubsystem * MySubsystem = LocalPlayer->GetSubsystem<UMyPlayerSubsystem>();}
+            \item UWorldSubsystem
+        \end{itemize}
+        \uline{Neccessary code for subsystems}
+        \begin{lstlisting}
+public:
+    // Begin USubsystem
+    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    virtual void Deinitialize() override;
+    // End USubsystem
+        \end{lstlisting}
+
+    \section{Niagara}
+        \begin{itemize}
+            \item Has to be added in the build.cs file in the 'PublicDependencyModuleNames' Array as 'Niagara'
+            \item Objects are
+            \begin{itemize}
+                \item \code{UNiagaraSystem*}
+                \item \code{UNiagaraComponent*}
+            \end{itemize}
+            \item In order to use Functions use \code{#include NiagaraFunctionLibrary.h}
+            \item To add assign the Niagara emitter to the System use \code{ProjectileComp->SetAsset(ProjectileParticles)} 
+            \item spawning a NiagaraSystem is made with: \code{UNiagaraFunctionLibrary::SpawnSystemAtLocation(...)}
+        \end{itemize}
+
+        \subsection{Projectiles}
+            \begin{itemize}
+                \item 
+            \end{itemize}
+
+    \section{Gameplay Timers}
+        \begin{itemize}
+            \item Schedule actions to perform
+            \item timers are managed in a global Timer Manager
+            \item Global Timer Manager: exists in Game Instance and in every WorldSettings
+        \end{itemize}
+        \begin{itemize}
+            \item create a \code{FTimerHandle} in the class you want to use a timer in
+            \item set timer with the GlobalTimerManager
+        \end{itemize}
+        \uline{Simple Timer that calls a function}
+        \begin{lstlisting}
+    FTimerHandle TH_PrimaryAttack;
+    GetWorldTimerManager().SetTimer(TH_PrimaryAttack, this, &AVCharacter::FireProjectile, 0.2f);
+        \end{lstlisting}
+
+        \textbf{\uline{Timer that takes in parameters}}
+        \begin{lstlisting}
+    /* .h */
+    FTimerDelegate TimerDel;
+	FTimerHandle ShootHandle;
+    
+    /* .cpp */
+    TimerDel.BindUFunction(this, FName("Shoot"), TargetCharacter);
+	GetWorldTimerManager().SetTimer(ShootHandle, TimerDel, AttackSpeed, true);
+        \end{lstlisting}
+
+    \section{Delegates}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm} | p{12cm}}
+                \hline
+                    Function signature & Declaration macro \\
+                \hline
+                    \code{void Function()} & \makecell{\code{DECLARE_DELEGATE(DelegateName)}} \\
+                    \code{void Function(Param1)} & \makecell{\code{DECLARE_DELEGATE_OneParam(DelegateName, Param1Type)}} \\
+                    \code{void Function(Param1, Param2)} & \makecell{\code{DECLARE_DELEGATE_TwoParams(DelegateName, Param1Type, Param2Type)}} \\
+                    \code{void Function(Param1, Param2, ...)} & \makecell{\code{DECLARE_DELEGATE_[PARAM\#](DelegateName, Param1Type, Param2Type, ...)}} \\
+                    \code{[RET_VALUE] Function()} & \makecell{\code{DECLARE_DELEGATE_RetVal(RetValType, DelegateName)}} \\
+                    \code{[RET_VALUE] Function(Param1)} & \makecell{\code{DECLARE_DELEGATE_RetVal_OneParam(RetValType, DelegateName, Param1Type)}} \\
+                    \code{[RET_VALUE] Function(Param1, Param2)} & \makecell{\code{DECLARE_DELEGATE_RetVal_TwoParams(RetValType, DelegateName, Param1Type, Param2Type)}} \\
+                    {\makecell{[RET\_VALUE] \\ Function(Param1, Param2 ...)}} & \makecell{\code{DECLARE\_DELEGATE\_RetVal\_[PARAM\#](RetValType, DelegateName, Param1Type, Param2Type, ...)}} \\
+                \hline
+            \end{tblr}
+        \end{table}
+
+         \includegraphics[width=\textwidth]{DelegateTypes.png}
+
+    \section{Create custom Config files}
+        \begin{itemize}
+            \item add UCLASS specifiers:
+            \begin{itemize}
+                \item 'Config=ConfigName' $\rightarrow$ UPROPERTY values can be set from ini file
+                \item 'PerObjectConfig' $\rightarrow$ if every instance should write to .ini file 
+                \item 'UPROPERTY(Config)' $\rightarrow$ property value can be set from ini file
+            \end{itemize}
+            \item Configuration Categories:
+            \begin{itemize}
+                \item Compat
+                \item DeviceProfiles
+                \item Editor
+                \item EditorGameAgnostic
+                \item EditorKeyBindings
+                \item EditorUserSettings
+                \item Engine
+                \item Game
+                \item Input
+                \item Lightmass
+                \item Scalability
+            \end{itemize}
+        \end{itemize}
+
+    \section{Interfaces}
+        \begin{table}[H]
+            \begin{tblr}{p{6cm} | p{12cm}}
+                \hline
+                    UFUNCTION type & Description \\
+                \hline
+                    \textbf{NO} UFUNCTION &
+                    C++ only $\rightarrow$ can have \textbf{default implementation}
+
+                    BlueprintCallable &
+                    Functions using the BlueprintCallable specifier can be called in C++ or Blueprint using
+                    a reference to an object that implements the interface \\
+
+                    BlueprintImplementableEvent &
+                    can not be overridden in C++, but can be overridden in any Blueprint class that implements
+                    or inherits your interface. \\
+                    
+                    BlueprintNativeEvent &
+                    Functions using BlueprintNativeEvent can be implemented in C++ by overriding a function
+                    with the same name, but with the suffix \_Implementation added to the end. \\
+            \end{tblr}
+        \caption{Types of UFUNCTIONs for Interfaces}
+        \end{table}
+
+        \subsection{Basic setup}
+            \begin{itemize}
+                \item check if the actor implements the interface \code{->Implements<UInterfaceName>()}
+                \item cast the actor to the interface \code{Cast<IINTERFACE_NAME>(Actor)}
+                \item call function from the interface \code{Execute_InterfaceFunction(ActorImplementingTheInterface)}
+            \end{itemize}
+            \uline{Example implementation}
+            \begin{lstlisting}
+void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	if (Data.Target.GetAvatarActor()->Implements<UIDeath>())
+	{
+		if (Data.EvaluatedData.Attribute.GetNumericValue(this) <= 0)
+		{
+			Cast<IIDeath>(Data.Target.GetAvatarActor())->Execute_Died(Data.Target.GetAvatarActor());
+		}
+	}
+}
+        \end{lstlisting}
+
+        \subsection{Making pointers an output}
+        \begin{itemize}
+            \item make the normal pointer a \code{Pointer reference}
+        \end{itemize}
+        \begin{lstlisting}
+UFUNCTION(BlueprintImplementableEvent)
+void GetHintAndIcon(FString& Text, UTexture2D*& Texture);
+        \end{lstlisting}
+
+
+    \section{Blueprint Library}
+        \begin{itemize}
+            \item create BlueprintFunctionLibrary
+            \item each function has to be \code{static}
+        \end{itemize}
+
+
+    \section{JSON}
+        \begin{itemize}
+            \item 
+        \end{itemize}
+        \begin{lstlisting}
+    FString Out;
+	FString Path = FPaths::ProjectContentDir();
+	Path.Append("TestJson.json");
+	FJsonObjectConverter::UStructToJsonObjectString( Struct, Out, 0, 0);
+	FFileHelper::SaveStringToFile(Out, *Path);
+        \end{lstlisting}    
+
+    \section{Usefull C++ Code}
+        \uline{Moving a Pawn}
+            \begin{itemize}
+            \item Assign 'Action/Axis Mappings' in 'Project Settings'
+                \item include Components/InputComponent.h
+                \item Function map Functions to Keys in the SetupPlayerInputComponent 
+                \item declare and define the Functions
+            \end{itemize}
+            \uline{Example:}
+\begin{lstlisting}
+void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+    if (ensureAlwaysMsgf(EnhancedInputComponent != nullptr, TEXT("**********\nNeed to change to enhanced input\n**********")))
+    {
+        EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AVCharacter::Move);
+        EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AVCharacter::Look);
+        EnhancedInputComponent->BindAction(IA_Interact, ETriggerEvent::Triggered, this, &AVCharacter::Interact);
+    }
+}           
+\end{lstlisting}
+
+        \uline{Setup the Camera}
+            \begin{itemize}
+                \item declare a camera-component in the header-file
+                \item define it in the CPP-file
+                \item attach to root
+                \item set LocRot
+                \item 
+                \item ADVANCED:
+                \begin{itemize}
+                    \item declare springarm-component in the header-file
+                    \item define it in the CPP-file
+                    \item setup attachment to root
+                    \item set targetarmlength
+                    \item set bUsePawnControlRotation to true
+                \end{itemize}
+            \end{itemize}
+
+            \uline{Example:}
+            \begin{lstlisting}
+    FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+    FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+    FollowCamera->bUsePawnControlRotation = false;
+            \end{lstlisting}
+
+            \uline{Advanced: added springarmcomponent}
+            \begin{lstlisting}
+    CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 600.f;
+	CameraBoom->bUsePawnControlRotation = true;
+            \end{lstlisting}
+
+        \uline{Push a StaticMesh Component}
+\begin{lstlisting}
+StaticMesh->AddForce([FVECTOR])
+\end{lstlisting}
+\smallskip
+        \uline{create a random number}
+        \begin{lstlisting}
+    FMath::FRand();
+    FMath::FRandRange([START],[END]);
+        \end{lstlisting}
+\smallskip
+        \uline{Clamp values}
+        \begin{lstlisting}
+    FMath::Clamp([INPUTVARIABLENAME], [MINVALUE], [MAXVALUE]);
+        \end{lstlisting}
+\smallskip
+        \uline{Camera Setup for the player}
+        \begin{lstlisting}
+    FRotator NewRotation = GetActorRotation();
+    NewRotation.Yaw += CameraInput.X;
+    SetActorRotation(NewRotation);
+
+    FRotator NewSpringArmRotation = SpringArm->GetComponentRotation();
+    NewSpringArmRotation.Pitch = FMath::Clamp(NewSpringArmRotation.Pitch += CameraInput.Y, -80.f, -15.f);
+    SpringArm->SetWorldRotation(NewSpringArmRotation);
+        \end{lstlisting}
+\smallskip
+        \begin{lstlisting}
+    void AMyActor::PostInitProperties()
+    {
+        Super::PostInitProperties();
+        DamagePerSecond = TotalDamage / TimeInSeconds;
+    }
+        \end{lstlisting}
+\smallskip
+        \uline{Add a delegate}
+\begin{lstlisting}
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
+
+UPROPERTY(BlueprintAssignable) // assignable in BPs (example AnimBP)
+FOnInventoryUpdated OnInventoryUpdated; //Add the actual delegate
+
+// IN THE CPP FILE
+OnInventoryUpdated.Broadcast();
+\end{lstlisting}
+
+        \uline{Save to file:}
+\begin{lstlisting}
+bool result = FFileHelper::SaveArrayToFile(ToBinary, TEXT(SAVEDATAFILENAME))
+\end{lstlisting}
+        \uline{Setup TriggerBox with collision channels:}
+\begin{lstlisting}
+ATriggerBox::ATriggerBox()
+{
+    TriggerBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    TriggerBox->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
+    TriggerBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    TriggerBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+    TriggerBox->SetBoxExtent(FVector(62.f, 62.f, 32.f));
+}
+ATriggerBox::BeginPlay()
+{
+    TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AFloorSwitch::OnOverlapBegin);
+    TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AFloorSwitch::OnOverlapEnd);
+}
+\end{lstlisting}
+
+    \uline{Print Debug Message}
+\begin{lstlisting}
+UE_LOGFMT(LogTemp, Display, "Text {0}", Variable);
+\end{lstlisting}
+
+    \uline{Logging}
+    \begin{lstlisting}
+UE_LOG(LogTemp, Warning, TEXT("My Text"))
+    \end{lstlisting}
+    \uline{LogTypes:}
+    \begin{itemize}
+        \item Fatal: printed to console and files even if logging is disabled
+        \item Error: to console and logs (red)
+        \item Warning: to conosle and files (yellow)
+        \item Display: to console and files
+        \item Log: NOT to console but files
+        \item Verbose:
+    \end{itemize}
+    \uline{Define custom category}
+    \begin{lstlisting}
+    DEFINE_LOG_CATEGORY(CategoryName);
+    \end{lstlisting}
+    
+\uline{BeginPlay equivalent for animations:}
+\begin{lstlisting}
+void NativeIntializeAnimation() override;
+\end{lstlisting}
+
+\uline{Get the World from viewport}
+\begin{lstlisting}
+FWorldContext* world = GEngine->GetWorldContextFromGameViewport(GEngine->GameViewport);
+world->World();
+\end{lstlisting}
+
+\uline{Set the CPP-Standard}
+\begin{lstlisting}
+CppStandard = CppStandardVersion.Cpp20;
+\end{lstlisting}
+
+
+\uline{Marker}
+\begin{lstlisting}
+FVector MarkerWorldPosition = ObjectiveMarker.GetWorldLocation();
+
+int32 ViewportWidth;
+int32 ViewportHeight;
+GetOwningPlayer()->GetViewportSize(ViewportWidth, ViewportHeight);
+FVector2D ViewportSize(ViewportWidth, ViewportHeight);
+
+FVector2D ScreenPosition;
+bool bHasScreenPos = false;
+
+ULocalPlayer* LP = GetOwningPlayer()->GetLocalPlayer();
+if (LP && LP->ViewportClient)
+{
+    // TODO: Should probably cache this per-frame instead of having each widget calculate this for itself.
+    FSceneViewProjectionData ProjectionData;
+    if (LP->GetProjectionData(LP->ViewportClient->Viewport, ProjectionData))
+    {
+        FMatrix const ViewProjectionMatrix = ProjectionData.ComputeViewProjectionMatrix();
+        FPlane Result = ViewProjectionMatrix.TransformFVector4(FVector4(MarkerWorldPosition, 1.f));
+        FIntRect ViewRect = ProjectionData.GetViewRect();
+
+        // the result of this will be x and y coords in -1..1 projection space
+        // TODO: This is very hacky - in theory we should only be using Result.W here (see ProjectWorldToScreen) but this seems to give good results.
+        // If we just use `Result.W` we get bad values with W < 0 (which ProjectWorldToScreen outright ignores). `FMath::Abs(Result.W)` gives good results
+        // but only when W isn't close to 0 (-300 < W < 300 all seems to give bad results with the position ending up in a far corner of the screen).
+        // Setting a minimum value of W based on the viewport height seems to give reasonable results, with the hackyness only being noticeable when watching carefully.
+        const float RHW = 1.0f / FMath::Max(FMath::Abs(Result.W), ViewRect.Height() / 2.f);
+        FPlane PosInScreenSpace = FPlane(Result.X * RHW, Result.Y * RHW, Result.Z * RHW, Result.W);
+
+        // Move from projection space to normalized 0..1 UI space
+        const float NormalizedX = ( PosInScreenSpace.X / 2.f ) + 0.5f;
+        const float NormalizedY = 1.f - ( PosInScreenSpace.Y / 2.f ) - 0.5f;
+
+        FVector2D RayStartViewRectSpace(
+            ( NormalizedX * (float)ViewRect.Width() ),
+            ( NormalizedY * (float)ViewRect.Height() )
+            );
+
+        ScreenPosition = RayStartViewRectSpace + FVector2D(static_cast<float>(ViewRect.Min.X), static_cast<float>(ViewRect.Min.Y));
+        ScreenPosition -= FVector2D(ProjectionData.GetConstrainedViewRect().Min);
+
+        bHasScreenPos = true;
+    }
+}
+\end{lstlisting}
+
+\uline{Iterate TMap}
+\begin{lstlisting}
+TMap<int32, AActor*> exampleIntegerToActorMap;
+for (const TPair<int32, AActor* >& pair : exampleIntegerToActorMap)
+{
+    pair.Key;
+    pair.Value;
+}
+\end{lstlisting}
+    
+\uline{FilterByPredicate}
+\begin{lstlisting}
+TArray<FVector> Things { FVector::ZeroVector, { 1 } };
+FVector* FoundXPositiveThing = Things.FindByPredicate([](const FVector& Item) { return Item.X > 0.f; });    
+\end{lstlisting}
+
+\uline{Save package}
+\begin{lstlisting}
+//FAssetRegistryModule::AssetCreated(NewWorld);
+//NewWorld->MarkPackageDirty();
+//FString FilePath = FString::Printf(TEXT("%s%s%s"), *ContentDirPath, *PackageName.RightChop(1), *FPackageName::GetAssetPackageExtension());
+//FSavePackageArgs SaveArgs;
+//SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+//bool bSuccess = UPackage::SavePackage(MyPackage, NewWorld, *FilePath, SaveArgs);
+\end{lstlisting}
+    
+
+    \subsection{Developer settings}
+        \begin{itemize}
+            \item set:
+            \begin{itemize}
+                \item \code{CategoryName} (Editor, Game )
+                \item \code{SectionName}
+            \end{itemize}
+        \end{itemize}
+
+        \begin{figure}[H]
+            \includegraphics[width=\textwidth]{DeveloperSettings.png}
+            \caption{DeveloperSettings}
+            \label{}
+        \end{figure}
+
+
+    \subsection{Check for MetaData in UCLASS UPROPERTY}
+        \uline{is editor only}
+        \begin{lstlisting}
+    Property->HasMetaData(TEXT("MyMetaTag"))
+        \end{lstlisting}
+
+
+    \section{Class Notes}
+        \subsection{ULocalPlayer}
+            \begin{itemize}
+                \item  Each player that is active on the current client has a LocalPlayer. It stays active across maps
+                \item  There may be several spawned in the case of splitscreen/coop.
+                \item  There may be 0 spawned on servers.
+                \item 
+            \end{itemize}
+
+
+        \subsection{UCommonUIActionRouterBase}
+            \begin{itemize}
+                \item The nucleus of the CommonUI input routing system
+                \item @todo DanH: Explain what that means more fully 
+                \item FlushInput
+            \end{itemize}
+
+        \subsection{UInputComponent}
+
+        \subsection{IInputProcessor}
+            \begin{itemize}
+                \item Interface for a Slate Input Handler
+                \item 
+            \end{itemize}
+             \includegraphics[width=\textwidth]{Bilder/IInputProcessor.jpg}
+
+        \subsection{FCommonInputPreprocessor}
+            \begin{itemize}
+                \item Helper class that is designed to fire before any UI has a chance to process input so that we can properly set the current input type of the application.
+                \item 
+            \end{itemize}
+
+        \subsection{FEnhancedInputEditorProcessor}
+            \begin{itemize}
+                \item used to pass InputKey events to the Enhanced Input Editor Subsystem
+                \item will not steal input, and all the functions here will return "False"
+                \item so that other Input Processors still run with all their normal considerations
+            \end{itemize}
+
+        
+        \subsection{UIActionRouterTypes}
+            \begin{itemize}
+                \item // Note: Everything in here should be considered completely private to each other and CommonUIActionRouter.
+                //They were all originally defined directly in CommonUIActionRouter.cpp, but it was annoying having to scroll around so much.
+            \end{itemize}
+

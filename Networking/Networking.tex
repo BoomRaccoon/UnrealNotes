@@ -1,0 +1,367 @@
+\chapter{Networking}
+    Networking in UE4 is called 'Replication'
+
+    \section{Basics}
+        \begin{itemize}
+            \item is Actor-centric
+            \item how to create 3 instances and connect them to the server (local debugging) :NEXT LINE:
+            \item Editor Preferences $\rightarrow$ type 'Multi' $\rightarrow$ tick 'Enable Network Emulation'
+            \item 
+            \item replication goes only SERVER $\rightarrow$ CLIENT but CLIENT $\nrightarrow$ SERVER
+            \item 
+            \item set \colorbox{mygray}{\lstinline{NetUpdateFrequency}} to an appropriate value ex.: 10 = $\frac{1}{5}$ $\rightarrow$ update every 5th of a second (0.2s)
+            \item \colorbox{mygray}{\lstinline{net.UseAdaptiveNetUpdateFrequency}} combined with \colorbox{mygray}{\lstinline{MinNetUpdateFrequency}}(minimum update attempts) and \colorbox{mygray}{\lstinline{NetUpdateFrequency}}(maximum update attempts) can improve perfermonce
+            \item 
+            \item clients must reconnect to the server for some actions, this is called Non-seamless-travel and occurs when:
+            \begin{itemize}
+                \item loading a map for the first time
+                \item connecting to a server for the first time as a client
+                \item you want to end a multiplayer game and start a new one
+            \end{itemize}
+        \end{itemize}
+
+        \includegraphics[width=\textwidth]{DomainExample.png}
+        \uline{}
+        \begin{itemize}
+            \item Server Only: Exist on the server (ex.: AGameMode)
+            \item Server \& Client: Exist on the Server and on all Clients (ex.: AGameState, APlayerState, APawn )
+            \item Server \& Owning Client: Exist on the Server and the owning Client (ex.: APlayerController)
+            \item Owning Client Only: Exist only on the Client (ex.: AHUD, UMG Widgets)
+        \end{itemize}
+    \begin{itemize}
+        \item \uline{Network Modes:} is a property of the world and can have the following values:
+        \begin{itemize}
+            \item NM\_Standalone := for singleplayer and local-multiplayer
+            \item NM\_Client := runs the game without any server-logic
+            \item NM\_ListenServer := runs the game and accepts connections
+            \item NM\_DedicatedServer := hosts a network multiplayer session without graphics
+        \end{itemize}
+        \item \uline{Replication-Features:}
+        \begin{itemize}
+            \item Creation \& Destruction := when an authoritative version of a repicated Actor is spawned on a server, it automatically generates remote proxis
+            \item Movement-Replication := bReplicateMovement = true and the Actor will replicate \textit{Location,Rotation,Velocity}
+            \item Variable-Replication := any variable that is 
+            \item Component-Replication := 
+            \item Remote-Procedure-Calls := 
+        \end{itemize}
+        \item \uline{Network Roles:}
+        \begin{itemize}
+            \item None := the actor has no role in a network game and does not replicate
+            \item Authority := the actor is authoritativ and replicates its information to remote proxies of it on other machines
+            \item Simulated Proxy (this are most actors) := the actor is a remote proxy that is controlled entirely by an authoritative actor on another machine
+            \item Autonomous Proxy (ex. player character) := the actor is a remote proxy that is capable of performing some functions locally, but receivs corrections from an authoritative actor
+        \end{itemize}
+    \end{itemize}
+\includegraphics[width=\textwidth]{NetworkLayout.jpg}
+
+        \uline{GameState}
+        \begin{itemize}
+            \item AGameStateBase \& AGameState
+            \item replicated to all Clients
+            \item most important class for shared information between Server \& Clients
+            \item keeps track of the Game State ex.: GameMode contains total KillCount GameState the Kills for every player
+            \item 
+        \end{itemize}
+
+        \uline{PlayerState}
+        \begin{itemize}
+            \item most important class for a specific Player
+            \item each Player has a PlayerState
+            \item access through PlayerArray inside of GameState
+            \item 
+            \item good for ex.:
+            \begin{itemize}
+                \item PlayerName
+                \item Score
+                \item Ping
+                \item GuildID
+            \end{itemize}
+        \end{itemize}
+
+        \uline{Player Controller:}
+        \begin{itemize}
+            \item exists on the Client \& Server
+            \item Clients don't know of each other PlayerControllers
+            \item GerPlayerController(0):
+            \begin{itemize}
+                \item Listen-Server: gets the Listen-Servers PlayerController
+                \item Client: gets the Clients PlayerController
+                \item Dedicated-Server: gets the first Clients \
+            \end{itemize}
+        \end{itemize}
+
+        \uline{Userful Classes:}
+        \begin{itemize}
+            \item AInfo := is an actor used to store information (is an actor in order to use replication)
+            \item 
+        \end{itemize}
+
+        \uline{RPCs invoked from Server}
+        \begin{table}[!htb]
+            \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+                \hline
+                    Actor Ownership & Not replicated & NetMulticast & Server & Client \\
+                \hline
+                    Client-owned Actor & Runs on Server & Runs on Server and all Clients & Runs on Server & Runs on Actors owning Client \\
+                    Server-owned Actor & Runs on Server & Runs on Server and all Clients & Runs on Server & Runs on Server \\
+                    Unowned Actor & Runs on Server & Runs on Server and all Clients & Runs on Server & Runs on Server \\
+                \hline
+            \end{tabular}
+        \caption{ caption }  
+        \end{table}
+        
+        \uline{RPCs invoked from Server}
+        \begin{table}[!htb]
+            \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+                \hline
+                    Actor Ownership & Not replicated & NetMulticast & Server & Client \\
+                \hline
+                    Owned by invoking Client & Runs on invoking Client & Runs on invoked Client & Runs on Server & Runs on invoking Client \\
+                    Owned by a different Client & Runs on invoking Client & Runs on invoked Client & Dropped & Runs on invoking Client \\
+                    Server owned actor & Runs on invoking Client & Runs on invoked Client & Dropped & Runs on invoking Client \\
+                    Unowned Actor & Runs on invoking Client & Runs on invoked Client & Dropped & Runs on invoking Client \\
+                \hline
+            \end{tabular}
+        \caption{ caption }  
+        \end{table}
+        \begin{lstlisting}
+    UFUNCTION(Client, unreliable)
+    void ClientRPCFunction();
+
+    UFUNCTION(Client, reliable)
+    void ReliableClientRPCFunction();
+
+    UFUNCTION(NetMulticast, unreliable)
+    void MulticastRPCFunction();
+
+        \end{lstlisting}
+
+
+        
+        \subsection{Network prediction and reconciliation}
+        \begin{itemize}
+            \item prediction: player's next moves are tried to be predicted
+            \item reconciliation: corrects errors that occured during prediction
+        \end{itemize}
+        
+        \subsection{Bandwidth Optimization}
+        \begin{itemize}
+            \item network relevancy: 
+            \item replication conditions: 
+        \end{itemize}
+        
+        
+        \subsection{Workflow}
+            \begin{itemize}
+                \item 
+            \end{itemize}
+
+
+    \section{IRIS}
+        \textbf{\uline{Is the new networking plugin}}
+        \begin{itemize}
+            \item a new API to improve networking with paralization and decoupling gameplay code and network code
+        \end{itemize}
+
+        \textbf{\uline{Main parts}}
+        \begin{itemize}
+            \item \textbf{\uline{Replication Bridge}}
+            \begin{itemize}
+                \item begins/end replication for actor or Objects
+                \item builds descriptors and protocols for replicated data
+            \end{itemize}
+            \item \textbf{\uline{Net Object}}
+            \begin{itemize}
+                \item internal representation of an actor/object consisting of
+                \item \uline{Replication protocol}
+                \item \uline{replication instance protocol}
+                \item \uline{buffer to store quantized data}
+            \end{itemize}
+            \item \textbf{\uline{Replication protocol}}
+            \begin{itemize}
+                \item per object type and shared between all instances of the same type
+                \item contains all replication state descriptors $\rightarrow$ net object can be restored with
+            \end{itemize}
+            \textbf{\uline{replication fragment}}
+            \begin{itemize}
+                \item component responsible for carrying replication states back-and-forth between gameplay code and replication system
+            \end{itemize}
+            \item \textbf{\uline{Net handle}}
+            \begin{itemize}
+                \item object that API-functions operate on
+                \item \uline{handle of} an actor
+                \item \uline{handle for} replication system
+                \item \uline{generated} by the replication system
+                \item \uline{returned} when \code{BeginReplication} is called on an actor
+            \end{itemize}
+        \end{itemize}
+
+
+        \textbf{\uline{replication state + replication state descriptor}}
+        \begin{itemize}
+            \item \textbf{\uline{replication state}}
+            \begin{itemize}
+                \item bridge between replication system and gameplay code
+                \item basic form is a struct containing data to be replicated
+            \end{itemize}
+            \item 
+            \item \textbf{replication state descriptor}
+            \begin{itemize}
+                \item memory layout
+                \item conditionals
+                \item filtering
+                \item prioritization
+                \item serialization
+            \end{itemize}
+        \end{itemize}
+
+
+        \subsection{workflow and dataflow}
+            \begin{itemize}
+                \item \textbf{Registration:}
+                \begin{itemize}
+                    \item \uline{manually}
+                    \item register object with replication system
+                    \item declare replication state and replication state descriptor (header properties / explicitly %TODO how do yuo do that?)
+                    \item 
+                    \item \uline{automatically}
+                    \item constructs a replication protocol and replication instance protocol using all replication states defined by the object and its components
+                    \item creates a net object corresponding to the newly registered object using the previously constructed replication protocol and replication instance protocol
+                    \item assigns the replicated object a unique net handle
+                \end{itemize}
+            \end{itemize}
+            
+            \begin{itemize}
+                \item \textbf{\uline{Sender}}
+                \begin{itemize}
+                    \item pre-send-update: polls all replicated objects for state changes if running in legacy mode
+                    \item quantizes all dirty state data with the apropriate net serializer
+                    \item updates the filtering status and prioritization of all net objects
+                    \item 
+                    \item send: create and fill packets by ticking all iris data streams
+                \end{itemize}
+                \item \textbf{\uline{Net-token-data-stream}}: serializes any new tokens with the apropriate net serializer
+                \item \textbf{\uline{Replication-data-stream}}: for data read from the replication data stream
+                \begin{itemize}
+                    \item deserializes and reads the received state data
+                    \item instantiates new objects immediately since they are required to build replication protocols
+                \end{itemize}
+                \item 
+            \end{itemize}
+            
+
+
+        \subsection{General notes}
+            \begin{itemize}
+                \item handle unexpected network behavior with \code{UEngine::OnNetworkFailure}
+                
+            \end{itemize}
+
+
+    \section{CPP}
+        \subsection{Replicate variables}
+            \begin{itemize}
+                \item any variable you want to replicate needs \colorbox{mygray}{\lstinline{UPROPERTY(replicated)}} 
+                \item and they need to implement the 'GetLifetimeReplicatedProps'-Function
+            \end{itemize}
+            \begin{lstlisting}
+        void ATestPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+            Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+            // Here we list the variables we want to replicate + a condition if wanted
+            DOREPLIFETIME(ATestPlayerCharacter, Health, COND_[...]);
+        }
+            \end{lstlisting}
+
+            \uline{Possible Conditions:}
+            \begin{itemize}
+                \item COND\_InitialOnly := only attempt to send on the initial bunch
+                \item COND\_OwnerOnly := only send to the owner
+                \item COND\_SkipOwner := send to every client except the owner
+                \item COND\_SimulatedOnly := only send to simulated actors
+                \item COND\_AutonomousOnly := only send to autonomous actors
+                \item COND\_SimulatedPhysics := send to simulated || bRepPhysics actors
+                \item COND\_InitialOrOwner := send to initial packet || actors owner
+                \item COND\_Custom := 
+            \end{itemize}
+
+            \uline{Replication-Methods}
+            \begin{itemize}
+                \item replicated := 
+                \item ReplicatedUsing=[FunctionName] := will call a function after a value is replicated
+            \end{itemize}
+            
+    \section{The Replicataion System}
+
+        !!! \textbf{not replicated features of Actors, Pawns, Characters} !!!
+        \begin{itemize}
+            \item Skeletal Mesh and Static Mesh component
+            \item Materials
+            \item Animation Blueprints
+            \item Particle Systems
+            \item Sound Emitters
+            \item Physics Objects
+            \item 
+            \item $\rightarrow$ so replicating the variables that drive them $\rightarrow$ every client creates a similar effect
+        \end{itemize}
+
+
+
+    \section{Blueprints}
+        \begin{itemize}
+            \item Any BP-class that should replicate $\rightarrow$ set 'Replicates'-Property to true
+            \item 
+            \item 'IsStandalone'-Node := to check if it's an offline session use 
+            \item 
+            \item 'HasAuthority'-Node := tells who has authority over the actor \& if it's replicated or not \& mode of replication \url{https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/Networking/Actors/Roles/}{Official Docs}
+            \item $\rightarrow$ ROLE\_SimulatedProxy will update 'AActor' based on it's 'NetUpdateFrequency' and predict ActorMovement etc. between those intervals based on it's velocity
+            \item $\rightarrow$ writing custom code for replication can be beneficial
+            \item 
+        \end{itemize}
+
+
+    \section{C++}
+        \begin{itemize}
+            \item you can add specifiers to 'UPROPERTY' in order to enable replication
+            \begin{itemize}
+                \item 'Replicate' := enables replication
+                \item 'ReplicateUsing = FunctionName' := will replicate and execute the specified function on changes
+                \item \colorbox{mygray}{\lstinline{GetLifetimeReplicatedProps(TArray <FLifetimeProperty> & OutLifetimeProps) const}}:
+                \begin{itemize}
+                    \item is the function that is responsible to replicate the properties
+                    \item 'Super::GetLifetimeReplicatedProps(OutLifetimeProps);' must be called
+                \end{itemize}
+            \end{itemize}
+            \item 
+        \end{itemize}
+
+        \uline{Needed Headers:}
+        \begin{itemize}
+            \item \colorbox{mygray}{\lstinline{#include "Net/UnrealNetwork.h"}}
+            \item 
+        \end{itemize}
+
+
+    \section{Crossplay}
+        \begin{itemize}
+            \item Game Services: 
+            \begin{itemize}
+                \item works with any account system
+                \item matchmaking
+                \item lobbies
+                \item peer-to-peer
+                \item Voice Chat
+                \item 
+                \item account linking
+                \item player data storage
+                \item stats
+                \item achievements
+                \item leaderboards
+                \item inventory
+                \item 
+                \item Anti-Cheat
+                \item Player Reports
+                \item Player Sanctions
+            \end{itemize}
+            \item Account Services: 
+        \end{itemize}

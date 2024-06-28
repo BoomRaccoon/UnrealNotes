@@ -1,0 +1,92 @@
+\chapter{World Creation}
+    \section{Landscape Settings}
+        \begin{itemize}
+            \item \code{Components}: Are the large squares; base unit of rendering, visibility calculation and collision; verts of shared component edges are duplicated
+            \item \code{Sections}: the smaller little squares inside the components can made out of of either 1 section or 4 sections (2x2); base unit for LOD calculations
+            \item \code{Section Size}: is the number of verts for each section (8, 16, 32, 64, 128, 256)
+            \item \code{Quads}:
+        \end{itemize}
+
+    \section{Landscape Foliage}
+        \underline{Types}
+        \begin{itemize}
+            \item Painted foliage
+            \item Landscape grass output (using material to paint on the layers)
+            \item procedural foliage volume
+        \end{itemize}
+        
+    \section{Notes}
+        \begin{itemize}
+            \item Procedural Foliage has no collision
+        \end{itemize}
+        \begin{itemize}
+            \item Landscape
+        \end{itemize}
+        \underline{Importing heightmap}
+        \begin{itemize}
+            \item Z-Scale: 1 $\rightarrow$ (1x256) 512cm height difference; 100 $\rightarrow$ (2x256) 512m height difference
+            \item White = high; black low
+        \end{itemize}
+        \begin{itemize}
+            \item 
+        \end{itemize}
+        \underline{Color coding landscape creation}
+        \begin{itemize}
+            \item Yellow: Landscape Edge
+            \item Light Green: Landscape Component Edge
+            \item Medium Green: Landscape Section Edge
+            \item Dark Green: Landscape Individual Quad
+        \end{itemize}
+        Each component = 1 draw call $\rightarrow$ Less Components $\rightarrow$ less draw calls \\
+\bigskip
+        \underline{CREATING THE LANDSCAPE}
+        \begin{itemize}
+            \item First create a landscape
+            \item form it with a height-map in the creation process or
+            \item sculp it
+            %\item assign a landscape material \hyperref[material_landscape]{creating a landscape material}
+        \end{itemize}
+
+
+
+        FOLIAGE: DISABLE ALIGN TO NORMAL \\
+    \section{Foliage}
+        \underline{Basics}
+        \begin{itemize}
+            \item Overdraw costs more than tries $\rightarrow$ try to make the leafes fill out the whole area
+            \item set dynamic shadow cascades to 1
+        \end{itemize}
+
+        \underline{Ways to place foliage}
+        \begin{itemize}
+            \item Foliage Mode Drag\&Drop static meshes you want to spawn
+            \item Enable Procedural Spawner in Editor Settings $\rightarrow$ Procedural Foliage Spawner
+            \item Landscape Material with Grass Output Type (assign meshes to array) 'Layer Sample Node' with layer name you want Grass-Type to spawn on
+        \end{itemize}
+        \begin{itemize}
+            \item SHIFT+4
+            \item Add Foliage
+            \item STATIC MESH (instanced mesh in order to make only 1 draw call)
+            \item Magnifying Glass in bottom right to edit Static Mesh
+            \item Brush Mode
+            \item Filter: where is it placable
+        \end{itemize}
+
+
+    \section{Grass on the landscape}
+        \underline{Used Nodes}
+        \begin{itemize}
+            \item Landscape Layer Blend
+            \item Landscape Sample (Must have the same Parameter as Layer you want to spawn the Grass on)
+            \item Landscape Grass (is also used for rocks)
+            \item Landscape Foliage $\rightarrow$ Landscape Grass Type (Culling settings)
+        \end{itemize}
+        We can restrict foliage spawning to specific Landscape Layers under 'Placement' $\rightarrow$ Advanced $\rightarrow$ 'Landscape Layers' \\
+\bigskip            
+        You can change the distance the foliage will stop spawning at with the
+        console command(smaller number will spawn further):
+\begin{lstlisting}
+foliage.MinimumScreenSize 0.00001            
+\end{lstlisting}
+
+      

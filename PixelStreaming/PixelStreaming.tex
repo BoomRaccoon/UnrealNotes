@@ -1,0 +1,33 @@
+\chapter{PixelStreaming}
+\label{PixelStreaming}
+    \section{Introduction}
+        \begin{itemize}
+            \item allows you to run a packaged application on a desktop PC and stream the viewport to clients using WebRTC
+            \item clients interact with it
+        \end{itemize}
+
+    \section{Setup}
+        \href{https://docs.unrealengine.com/en-US/Platforms/PixelStreaming/GettingStarted/index.html}{Official Docs}
+        \begin{itemize}
+            \item install node.js
+            \item enable the plugin \code{PixelStreaming}
+            \item under \code{Editor Preferences} add \code{Additional Launch Parameters} \\
+            \code{-AudioMixer -PixelStreamingIP=localhost -PixelStreamingPort=8888} 
+            \item after building the package you have to add the same parameters to the .exe \\
+            you can do this by creating a shortcut and adding the parameters to the end of \code{Target}
+            \item adding \code{-RenderOffScreen} will enable streaming even if the window gets minimized
+            \item 
+            \item \href{https://github.com/EpicGamesExt/PixelStreamingInfrastructure.git}{download the server from github} \\
+            or use the .sh script inside \code{\\Engine\\Plugins\\Media\\PixelStreaming\\Resources\\WebServers}
+            \item 
+            \item inside \code{SignallingWebServer\\platform\_scripts\\cmd} use the \code{Start_SignallingServer.ps1}
+            \item the command line will inform about the status of the server
+            \item 
+            \item now launch the application from the created shortcut
+        \end{itemize}
+
+    \section{Controls}
+        \begin{itemize}
+            \item the controls for the application are inside of the \code{Frontend} directory of the downloaded PixelStreaming directory
+            \item 
+        \end{itemize}

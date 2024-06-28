@@ -1,0 +1,230 @@
+\chapter{Niagara}
+    \section{VFX-Theory}
+        \subsection{Effect Types}
+            \begin{itemize}
+                \item Paricle System: using only particles 
+                \item Mesh: uses meshes as particles for the spawning system
+                \item Flipbook/SpriteSheets/Atlases: multiple images in one texture (so you can iterate over them)
+                \item Shader: ...
+                \item Hybrids: use multiple of the above
+            \end{itemize}
+        \subsection{VFX Principles}
+            \underline{How to convey information}
+            \begin{itemize}
+                \item Gameplay: effect purpose
+                \item Timing:
+                \begin{itemize}
+                    \item Anticipation: build-up (smooth transition) ex. high damage longer build-up
+                    \item Climax:
+                    \item Dissipation/Fade-Out:
+                \end{itemize}
+                \item Shape:
+                \item Contrast: to create a focal point (ex. brightest most important)
+                \item Color:
+            \end{itemize}
+            \includegraphics[width=\textwidth]{VFX_Principles.png}
+    \section{Niagara Basics}
+            \uline{Niagara Components:}
+            \begin{itemize}
+                \item Niagara-System: contains multiple Niagara-Emitters to create a complex effect
+                \item Niagara-Emitter: is an effect that spawns particles
+                \item Niagara-Node: one part of an emitter (displayed in the graph)
+                \item Niagara-Module: 
+                \item Niagara-Module-Script: are the parts that make up the module (functions)
+            \end{itemize}
+            \uline{Niagara-Modules:}
+            \begin{itemize}
+                \item add some logic
+                \item 
+                \item you can create Custom-Modules
+            \end{itemize}
+            \uline{How to Create a Niagara Emitter:}
+            \begin{enumerate}
+                \item Create a Niagara System
+                \item Add Emitters to the System
+                \item Add Modules - that specify the behaviour of the emitter - to the Emitter
+            \end{enumerate}
+
+        \subsection{GPU vs CPU}
+                \begin{itemize}
+                    \item GPU can't calculate bounds (Niagara-System might get culled even though it's visible but bounds might be too small)
+                    \item $\hookrightarrow$ resize the bounds := above viewport \code{Bounds} $\rightarrow$ \code{Dropdown-menu} $\rightarrow$ \code{Set fixed bounds}
+                \end{itemize}
+            
+            Modules $\rightarrow$ Emitter $\rightarrow$ System \\
+            There is a SystemEmitter from which other Emitters can inherit values \\
+            'Effect Types' stores advanced settings \\
+            'Max time without render' tells how long to look away until the emitter should be removed \\
+
+        \subsection{User Parameters}
+            \underline{Parameter-Space in Emitters}
+            \begin{itemize}
+                \item Emitter: exists in the 'Emitter' namespace
+                \item Transient: exists in 'Niagara System' namespace
+            \end{itemize}
+\bigskip
+\bigskip
+            \underline{Parameter-Space in Niagara-Systems}
+            \begin{itemize}
+                \item User: initialized per system;  
+                \item 
+            \end{itemize}
+
+
+            In order to use the Value you have to add a 'Set Parameter' Module in the 'Emitter Spawn'
+
+
+
+            \begin{itemize}
+                \item Every value can be edited through the 'Details Panel' if you 'Make' it a 'Read from new User Parameter'
+                \item the DEFAULT value can be set through the 'Niagra Overview Node' of the emitter system
+            \end{itemize}
+
+            \underline{Inside of an Emitter}
+            \begin{itemize}
+                \item Every value can be edited through the 'Details Panel' if you 'Make' it a 
+            \end{itemize}
+            
+
+\smallskip
+            \underline{Parameters and Parameter Types:}
+            \begin{itemize}
+                \item Primitive: numeric data with varying precision and channel widths
+                \item Enum: define fixed named values
+                \item Struct: combine Primitives and Enums
+                \item Data Interface: defines functinos that provide data from external sources like other UE4 parts or outside applications
+            \end{itemize}
+\smallskip
+            \begin{itemize}
+                \item Niagara operates as a stack with modules, executed from top to bottom
+                \item Every module is assign to a group to determine when to be executed
+                \item 'System Spawn' 'System Update' are executed first handling the shared behaviour between modules ( TODO: add examples of shared behaviour)
+                \item Then modules and items from the emitter groups 'Emitter Spawn' and 'Emitter Update'
+                \item Parameters in the particle groups execute for each unique particle
+                \item finally renderer group items which describe how to render each particle of a emitter
+            \end{itemize}                      
+\smallskip
+            \includegraphics[width=\textwidth]{NiagaraGroups.png} \\
+            \begin{itemize}
+                \item Emitter Settings
+                \item Emitter Spawn: modules that effect emitter on spawn
+                \item Emitter Update: modules that effect emitter over time
+                \item Particle Spawn: modules that effect the particle spawn
+                \item Particle Update: modules that effect the particle over time
+                \item Event Handlers: events that define certain data for one or more emitters to trigger a listener and his behaviour
+            \end{itemize}
+
+        \section{Data Interface}
+            \begin{itemize}
+                \item 
+            \end{itemize}
+
+        \section{Events}
+            \begin{itemize}
+                \item only on CPU
+                \item needs \code{Requires Persistant IDs}
+                \item Can be placed in any module to share data
+            \end{itemize}
+\bigskip
+            \underline{List of Events:}
+            \begin{itemize}
+                \item Location Events
+                \item Death Events
+                \item Collision Events
+            \end{itemize}
+
+            \subsection{Event Handlers}
+                \includegraphics[width=\textwidth]{EventHandlerProperties.png}
+                \underline{Event Handler 'Properties':}
+                \begin{itemize}
+                    \item defines the basics of the Handler
+                    \item Source: with a dropdown of all Gernerated Event modules
+                    \item Execution Mode: 
+                \end{itemize}
+\bigskip
+                \underline{Event Handler 'Receive Event':}
+                \begin{itemize}
+                    \item 
+                \end{itemize}
+
+            \subsection{Collision example}
+                \begin{itemize}
+                    \item use \code{Generate Collision event} on one emitter
+                    \item add \code{Event Handler} with \code{Source: Collision Event} on another
+                    \item $\hookrightarrow$ add \code{Receive: Collision Event} to get actual collision-data
+                \end{itemize}
+
+            \subsection{Useful Nodes}
+                \begin{itemize}
+                    \item Add Velocity
+                    \item Add Acceleration
+                    \item Drag
+                    \item PRESS SPACE BAR TO RESET EMITTER
+                \end{itemize}
+                
+            \subsection{Side Notes}
+            \begin{itemize}
+                \item Events are only supported by CPU simulations (19.5)
+                \item Simulations can be performed once and the result can be shared with other modules
+                \item Drag = Widerstand
+                \item Masked material gives hard edges that's why translucent is better when doing fx
+            \end{itemize}
+
+
+    \section{Crowds}
+        \begin{itemize}
+            \item AI with Behavior-Trees is the standard approach
+            \item 
+            \item Create an empty 'Niagara System
+            \item 
+            \item add a new empty emitter to it
+            \item 
+            \item delete 'Initialize Particle'
+            \item replace 'Sprite Renderer' with 'Mesh Renderer'
+            \item 
+            \item under 'Emitter Update' add 'Spawn Burst Instantaneous'
+            \item change the spawn Count to 1
+            \item 
+            \item under 'Emitter State' change 'Life Cycle Mode' = 'Self' $\rightarrow$ 'Loop Behavior' = 'Once' + 'Loop Duration Mode' = 'Infinite'
+            \item 
+            \item under 'Particle Update' $\rightarrow$ 'Paricle State' $\rightarrow$ disbale 'Kill Particles When Liftime Has Elapsed'
+            \item add the 'New Scratch Pad Module' (:= visual scripting for HLSL)
+            \item add 'NFS Play Animation'
+            \item 
+        \end{itemize}
+
+
+    \section{Some effects}
+        \subsection{Ground Crack}
+            \begin{itemize}
+                \item Create 2048x2048 image in PS
+                \item draw with grey circle
+                \item add 'cracks' on the edge pointing outwards
+                \item highlight with small bright brush
+                \item lessen opacity outwards with erase tool
+                \item 
+                \item copy paste on second layer
+                \item rotate and erase some parts
+                \item 
+                \item export as png
+            \end{itemize}
+
+
+        \subsection{Flipbook}
+            \begin{itemize}
+                \item create emitter with following modules and set the properties
+                \item \code{Emitter-State} := \code{Loop-Behavior} = Once; \code{Loop-duration} = fixed;
+                \item \code{Initialize-Particle} := \code{Lifetime} = shorter $\rightarrow$ plays Flipbook faster
+                \item \code{Spawn Burst Instantaneous} := \code{Spawn} count = 1
+                \item \code{Sprite Renderer}
+                    \begin{itemize}
+                        \item \code{Material} := your Flipbook
+                        \item \code{Sub Image Size} := number of images in the Flipbook
+                    \end{itemize}
+                \item \code{SubUVAnimation}
+                    \begin{itemize}
+                        \item \code{Number of frames} := number of images in Flipbook
+                    \end{itemize}
+            \end{itemize}
+
+ 

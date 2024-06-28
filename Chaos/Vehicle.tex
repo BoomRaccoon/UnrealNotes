@@ -1,0 +1,67 @@
+\section{Vehicle}
+    \subsection{Setup}
+        \subsubsection{create the seketal mesh}
+            \begin{itemize}
+                \item create a root bone
+                \item create a bone for each wheel
+            \end{itemize}
+
+        \subsubsection{Create physics asset}
+            \begin{itemize}
+                \item delete all physics bodies
+                \item select the root, set \code(primitive type = box) and uncheck \code(auto orient to bone)
+                \item 
+                \item select all wheels, set \code(primitive type = sphere) and \code(check auto orient to bone)
+                \item select physics-bodies of the wheels and set \code(disable collision) (because they will interact with the world through ray casts)
+                \item set set \code(physics type = kinematic)
+            \end{itemize}
+        
+        \subsubsection{Create BP}
+            \begin{itemize}
+                \item create BP from \code{WheelVehiclePawn}-class
+                \item ASSGIN SKELETAL-MESH
+                \item 
+                \item SELECT \code{vehicle-movement-component} $\rightarrow$ \code{Wheel setup} $\rightarrow$ \code{wheel setups}
+                \item add one for each wheel
+                \item 
+                \item select wheel and create a new \code{wheel-class-asset} and edit the newly created asset
+                \item FRONT-WHEEL-SETUP:
+                \item \code{Axis-Type: Front}
+                \item measure the size by going into top view and use \code{Middle-Mouse and DRAG}
+                \item assign \code{Wheel-Width} \code{Radius}
+                \item \code{Friction-Force-Multiplier} to 4
+                \item check \code{Affected-By-Steering}
+                \item BACK-WHEEL-SETUP:
+                \item \code{Axis-Type: Rear}
+                \item check \code{Affected-By-Engine}
+                \item unncheck \code{Affected-By-Steering}
+                \item 
+                \item Assign the wheel config files
+                \item 
+                \item Assign bone names in wheel setup of the BP
+                \item 
+                \item \code{Mechanical setup} $\rightarrow$ \code{Engine-Setup}
+                \item create external curve asset
+                \item the last pointn is \code{Max-RPM}
+                \item example curve values are P1(0, 0.5) P2(1000, 1) P3(4000, 0.8) P4(5000 , 0.5) (x:=RPM)
+                \item adjuet \code{Max-RPM} to your value
+                \item 
+                \item MAP-INPUT
+                \item \code{Set-Throttle-Input}
+                \item \code{Set-Break-Input}
+                \item \code{Set-Steering-Input}
+            \end{itemize}
+
+        \subsubsection{Anim BP}
+            \begin{itemize}
+                \item Right-Click skeletalmesh and create AnimBP
+                \item change parent class of the AnimBP in \code{Class-Settings} $\rightarrow$ \code{Parent-Class} to \code{VehicleAnimationInstance}
+            \end{itemize}
+
+
+    \subsection{Vehicle tweaking}
+        \uline{\code{Vehicle Movement Compontent}}:
+        \begin{itemize}
+            \item \code{Wheel Setup} $\rightarrow$ Suspension Enabled
+            \item \code{Wheel Setups} $\rightarrow$ assign \code{Chaos Vehicle Wheel}-assets here
+        \end{itemize}

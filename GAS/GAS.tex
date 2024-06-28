@@ -1,0 +1,295 @@
+\chapter{Gameplay ability system (GAS)}
+    \begin{itemize}
+        \item UAbilitySystemComponent := is the main thing
+        \item FGameplayAbilitySpecContainer := holds its granted GAs
+        \item Gameplay Ability := logic of the gameplay mechanic $\rightarrow$ everything can be gameplay ability
+        \item Avatar := \glsdesc{GLS-Avatar}
+        \item 
+        \item 
+        \item FActiveGameplayEffectsContainer := holds the currently active GEs
+        \item Gameplay Effects: modifies attributes and tags instantly or for certain amount of time; how is it changing
+        \item Gameplay AttributeSet := used on the same Actor that the ASC lives on (PlayerState / Character)
+        \item Gameplay Attributes := actor properties(health, damage, state) modified by ASC; modified through gameplay effects; composed of \code{BaseValue} \code{CurrentValue}
+        \item 
+        \item Gameplay cues := for audio/visual effects 
+        \item 
+        \item GameplayTagManager := handles Tags globally
+        \item GameplayTagContainer := is used inside ASCs $\rightarrow$ one on each Actor with an ASC
+        \item GameplayTagMap := stores number of instances of GameplayTags
+        \item Gameplay Tags := same principle as Actor Tags; handles intercaten between different gameplay- abilities \& effects; good to think about them as conditions
+        \item TagMapCount
+        \item 
+        \item needs to implement \code{UAbilitySystemComponent* GetAbilitySystemComponent() const}
+        \item Character:
+        \begin{itemize}
+            \item includes:
+            \begin{itemize}
+                \item "AbilitySystemInterface.h"
+                \item "GameplayEffectTypes.h"
+            \end{itemize}
+            \item derives from 'public IAbilitySystemInterface'
+        \end{itemize} 
+        \item 
+    \end{itemize}
+
+    GAS as a whole is basically just a couple of basic UObject classes and an ActorComponent.
+    The Component gets put on the actor that can use the ability. Then there is the actual
+    GameplayAbility. This is just a UObject that gets instantiated based on settings. Once per
+    user, once ever, or once per ability use I think. The component handles most all of the 
+    "CanUse" stuff based on tags on the actor, etc. What you allow in the ability class is 
+    entirely up to you. How you mutate the ability based on other factors is entirely up to 
+    you. The other classes are basically a visual which is GameplayCues, and then there's 
+    GameplayEffects which are what modify the attributes. You'd use an Effect to buff strength, 
+    or heal, or damage health, etc. You use Gameplay Abilities to apply effects(though you can 
+    apply effects from anywhere). So yeah. At it's core it's just a component that runs small 
+    UObjects that can handle the lifetime of the ability.
+
+
+    \section{Random notes}
+    \begin{itemize}
+        \item AbilitySystemComponent->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("State.Debuff.Stun")), EGameplayTagEventType::NewOrRemoved).AddUObject(this, \&AGDPlayerState::StunTagChanged);
+        \item This is from GASDocumentation (one of the pinned messages here and one of my favorite tools I'm learning GAS with)
+        \item In this example the PlayerState has the function: virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount); that's being bound to when the tag is applied
+
+        \item 
+    \end{itemize}
+    
+    \section{Main}
+        \begin{itemize}
+            \item should be added to the PlayerState (if presistant Attributes) or the character/pawn
+            
+            \item \code{ActivatableAbilities.Items}
+            \item use \code{ABILITYLIST_SCOPE_LOCK();} to iterate over \code{ActivatableAbilities.Items}
+            \item \textbf{remove} Abilities only outside of \code{ABILITYLIST_SCOPE_LOCK();} $\rightarrow$ will only remove if no locks in use
+            
+            \item IAbilitySystemInterface either on \code{PlayerState} or \code{Actor}
+        \end{itemize}
+
+    \section{AttributeSet}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm} | p{6cm} | p{6cm}}
+                \hline
+                    Macro & Function Signature & Description \\
+                \hline
+                GAMEPLAYATTRIBUTE \_PROPERTY\_GETTER (UMyAttributeSet, Health) &
+                static FGameplayAttribute GetHealth() &
+                Static function, returns the FGameplayAttribute struct from the engine's reflection system \\
+                
+                GAMEPLAYATTRIBUTE \_VALUE\_GETTER (Health) &
+                float GetHealth() const &
+                Returns the current value of the "Health" Gameplay Attribute \\
+
+                GAMEPLAYATTRIBUTE \_VALUE\_SETTER (Health) &
+                void SetHealth(float NewVal) &
+                Sets the "Health" Gameplay Attribute's value to NewVal \\
+
+                GAMEPLAYATTRIBUTE \_VALUE\_INITTER (Health) &
+                void InitHealth(float NewVal) &
+                Initializes the "Health" Gameplay Attribute's value to NewVal \\
+            \end{tblr}
+        \caption{ caption }  
+        \end{table}
+        
+
+    \section{Make changes to attributes}
+        \begin{itemize}
+            \item check if ablitySystem and the used  GameplayEffect exist
+            \item use:
+            \begin{itemize}
+                \item \code{FGameplayEffectContextHandle EffectContext = AbilitySystem->MakeEffectContext();} to create a handle
+                \item \code{EffectContext.AddSourceObject(this);}
+            \end{itemize} 
+            \item 
+        \end{itemize}
+    
+    \section{Gameplay Abilities}
+        \uline{Gameplay Ability Functions}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm} | p{12cm}}
+                \hline
+                    Function & Usage \\
+                \hline
+                    \code{TryActivateAbility} &
+                    typical way to execute abilities calls \code{CanActivateAbility} and then \code{CallActivateAbility} \\
+                    
+                    \code{CanActivateAbility} &
+                    lets the caller know if ability is available (eg.: widgets call to indacate status) \\
+
+                    \code{CallActivateAbility} &
+                    executes the ability without prior checks \\
+
+                    & \\
+
+                    \code{ActivateAbility} &
+                    main code to do things \\
+
+                    \code{CommitAbility} &
+                    applies costs to \code{Attribtues} \\
+
+                    \code{CancelAbility} &
+                    allows to cancel an ability from anywhere and broadcasts to \code{OnGamepalyAbilityCancelled} (can be prevented with \code{CanBeCanceled}) \\
+
+                    & \\
+
+                    \code{EndAbility} &
+                    shuts down the ability. NOT calling this can lead to serious bugs where ability can't be activated anymore or blocks other abilities. \\
+
+                \hline
+            \end{tblr}
+        \end{table}
+    
+
+        \uline{Gameplay Ability Tag Variables}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm} | p{12cm}}
+                \hline
+                Gameplay Tag Variable(s) & Purpose\\
+                \hline
+                Cancel Abilities With Tag &
+                Cancels any already-executing Ability with Tags matching the list provided while this Ability is executing. \\
+                
+                Block Abilities With Tag&
+                Prevents execution of any other Ability with a matching Tag while this Ability is executing. \\
+                
+                Activation Owned Tags &
+                While this Ability is executing, the owner of the Ability will be granted this set of Tags. \\
+                
+                Activation Required Tags &
+                The Ability can only be activated if the activating Actor or Component has all of these Tags. \\
+                
+                Activation Blocked Tags &
+                The Ability can only be activated if the activating Actor or Component does not have any of these Tags. \\
+                
+                Target Required Tags &
+                The Ability can only be activated if the targeted Actor or Component has all of these Tags. \\
+                
+                Target Blocked Tags &
+                The Ability can only be activated if the targeted Actor or Component does not have any of these Tags. \\
+            \end{tblr}
+        \end{table}
+    
+    \section{GameplayCues}
+        \begin{itemize}
+            \item 
+        \end{itemize}
+        
+        \subsection{GameplayCueParameters}
+            \begin{itemize}
+                \item has:
+                \begin{itemize}
+                    \item \code{Instigator} := who owns the ability-system
+                    \item \code{SourceObject} := the object that created the effect
+                    \item \code{EffectCauser} := physical object that did the damage (auto set to avatarActor)
+                \end{itemize}
+            \end{itemize}
+    
+    \section{Code}
+        \uline{define player attributes:}
+            \begin{lstlisting}
+        UPROPERTY(BlueprintReadOnly, Category="Health", ReplicatedUsing = OnRep_Health)
+        FGameplayAttributeData Health;
+        ATTRIBUTE_ACCESSORS(UWH_PawnAttributes, Health)
+            \end{lstlisting}
+            \uline{Give ability to players}
+            \begin{lstlisting}
+        AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, AbilityLevel, InputEnum));
+            \end{lstlisting}
+
+            For player controlled characters where the ASC lives on the Pawn, I typically initialize on
+            the server in the Pawn's PossessedBy() function and initialize on the client in the
+            PlayerController's AcknowledgePossession() function.
+            \begin{lstlisting}
+void APACharacterBase::PossessedBy(AController * NewController)
+{
+    Super::PossessedBy(NewController);
+
+    if (AbilitySystemComponent)
+    {
+        AbilitySystemComponent->InitAbilityActorInfo(this, this);
+    }
+
+    // ASC MixedMode replication requires that the ASC Owner's Owner be the Controller.
+    SetOwner(NewController);
+}
+        \end{lstlisting}
+        
+        \begin{lstlisting}
+void APAPlayerControllerBase::AcknowledgePossession(APawn* P)
+{
+    Super::AcknowledgePossession(P);
+
+    APACharacterBase* CharacterBase = Cast<APACharacterBase>(P);
+    if (CharacterBase)
+    {
+        CharacterBase->GetAbilitySystemComponent()->InitAbilityActorInfo(CharacterBase, CharacterBase);
+    }
+
+    //...
+}
+        \end{lstlisting}
+
+        For player controlled characters where the ASC lives on the PlayerState,
+        I typically initialize the server in the Pawn's \code{PossessedBy()} (which gets
+        called even before \code{BeginPlay()}) function and
+        initialize on the client in the Pawn's \code{OnRep_PlayerState()}-function.
+        This ensures that the PlayerState exists on the client.
+        \begin{lstlisting}
+// Server only
+void AGDHeroCharacter::PossessedBy(AController * NewController)
+{
+    Super::PossessedBy(NewController);
+
+    AGDPlayerState* PS = GetPlayerState<AGDPlayerState>();
+    if (PS)
+    {
+        // Set the ASC on the Server. Clients do this in OnRep_PlayerState()
+        AbilitySystemComponent = Cast<UGDAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+
+        // AI won't have PlayerControllers so we can init again here just to be sure. No harm in initing twice for heroes that have PlayerControllers.
+        PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
+    }
+    
+    //...
+}        
+        \end{lstlisting}
+
+        \begin{lstlisting}
+// Client only
+void AGDHeroCharacter::OnRep_PlayerState()
+{
+    Super::OnRep_PlayerState();
+
+    AGDPlayerState* PS = GetPlayerState<AGDPlayerState>();
+    if (PS)
+    {
+        // Set the ASC for clients. Server does this in PossessedBy.
+        AbilitySystemComponent = Cast<UGDAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+
+        // Init ASC Actor Info for clients. Server will init its ASC when it possesses a new Actor.
+        AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+    }
+
+    // ...
+}
+        \end{lstlisting}
+
+
+        \uline{Listen for Tag Changes}
+        \begin{lstlisting}
+    AbilitySystemComponent->RegisterGameplayTagEvent(
+    FGameplayTag::RequestGameplayTag(FName("State.Debuff.Stun")),
+    EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AGDPlayerState::StunTagChanged);
+        \end{lstlisting}
+        \begin{lstlisting}
+    virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+        \end{lstlisting}
+
+        \uline{Delegate for Attribute changes}
+        \begin{lstlisting}
+    AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+    AttributeSetBase->GetHealthAttribute()).AddUObject(this, &AGDPlayerState::HealthChanged);
+        \end{lstlisting}
+
+        \begin{lstlisting}
+    virtual void HealthChanged(const FOnAttributeChangeData& Data);
+        \end{lstlisting}

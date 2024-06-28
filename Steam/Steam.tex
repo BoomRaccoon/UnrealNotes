@@ -1,0 +1,34 @@
+\chapter{Steam-Online-Subsystem}
+    \begin{itemize}
+        \item enables to ship applications to Valve's steam platform
+        \item enables features like:
+        \begin{itemize}
+            \item matchmaking
+            \item leaderboards
+            \item achievements
+            \item voice
+            \item usercloud
+            \item sharecloud
+            \item external UI
+        \end{itemize}
+        \item needs Steamworks SDK:
+        \begin{itemize}
+            \item download the sdk
+            \item place in \colorbox{mygray}{\lstinline{/YourUnrealEnginePath/Engine/Source/ThirdParty/Steamworks/Steam[Current Version]/sdk}}
+        \end{itemize}
+        \item place following files from /redistributable_bin/ directory of the SDK  into \colorbox{mygray}{\lstinline{/YourUnrealEnginePath/Engine/Binaries/ThirdParty/Steamworks/Steam[Current Version]/Win64}}
+        \begin{itemize}
+            \item steam_api64.dll
+            \item steamclient64.dll
+            \item tier0_s64.dll
+            \item vstdlib_s64.dll
+        \end{itemize}
+        \item \colorbox{mygray}{\lstinline{/YourUnrealEnginePath/Engine/Binaries/ThirdParty/Steamworks/Steam[Current Version]/Win32}}
+        \begin{itemize}
+            \item steam_api.dll
+            \item steamclient.dll
+            \item tier0_s.dll
+            \item vstdlib_s.dll 
+        \end{itemize}
+        \item STEAM_APP_ID := is placed in the \colorbox{mygray}{\lstinline{steam_appid.txt}} file, located same place as the applications executable
+    \end{itemize}

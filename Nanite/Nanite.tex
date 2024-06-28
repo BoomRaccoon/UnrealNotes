@@ -1,0 +1,113 @@
+\chapter{Nanite}
+    \begin{itemize}
+        \item virtualized geometry system
+        \item most meshes will render faster
+        \item take up less memory and disk space
+        \item the viewport can display Nanite Mesh or the Nanite Proxy
+    \end{itemize}
+
+    \uline{Use cases}
+        \begin{itemize}
+            \item mesh with many triangles
+            \item if it will be very small on screen
+            \item has many instances in the scene
+            \item acts as a major occluder of other nanite geometry
+        \end{itemize}
+
+    \uline{Enable Nanite}
+        \begin{itemize}
+            \item just check the 'Build Nanite' checkbox on import
+            \item disable 'Generate Lightmap UVs' (% TODO: WHY?)
+            \item 
+            \item Additional Settings:
+            \begin{itemize}
+                \item 'Position Precsision': quantization steps
+                \item 'Proxy Triangle Percent': how much of the geometry should be preserved (will have min 2000 verts or original mesh if less)
+            \end{itemize}
+        \end{itemize}
+
+    \uline{Nanite vs Static Mesh}
+        \begin{itemize}
+            \item essentially a triangle mesh
+            \item lot of level of detail \& compression
+            \item new rendering system for extreme efficiency
+            \item 
+        \end{itemize}
+
+    \\section{Drawbacks}
+        \begin{itemize}
+            \item no Deformations:
+            \begin{itemize}
+                \item Skeletal animation
+                \item Morph Targets
+                \item World Position Offset in materials
+                \item Spline meshes
+            \end{itemize}
+            \item no custom depth or stencil (% TODO: What is a stencil)
+            \item no vertex painting in editor
+            \item material:
+            \begin{itemize}
+                \item only 'Opaque'
+                \item Deferred Decal
+                \item Wireframe
+                \item Pixel Depth Offset
+                \item World Position Offset
+                \item Custom Per-Instance Data
+                \item Two Sided
+                \item Vertex Interpolator node
+                \item Custom UVs
+                \item pixel shader (customized UVs) is expensive
+            \end{itemize}
+            \item rendering:
+            \begin{itemize}
+                \item View-specifing filter of objects
+                \item 
+            \end{itemize}
+            \item no split-screen
+        \end{itemize}
+
+        \uline{Preserve area}
+        \begin{itemize}
+            \item is used for foliage because leaves will disapear
+        \end{itemize}
+        \subsection{Materials}
+        Nanite supports materials which have their Blend Mode set to Opaque. Other material types are disallowed or will have no effect on Nanite meshes when used.
+
+When an unsupported material is detected, a default material is assigned and a warning is placed in the Output Log with additional information.
+
+The following is a sampling of unsupported Nanite Material features:
+
+    Blend Modes using Masked or Translucent
+
+
+    Wireframe
+
+    Two Sided
+
+    Pixel Depth Offset
+
+    World Position Offset
+
+    Custom Per-Instance Data 
+
+Using the following in a Material applied to a Nanite-enabled mesh will cause the mesh to appear visibly broken:
+
+    Vertex Interpolator node
+
+    Custom UVs 
+
+
+    \section{Foliage}
+        \begin{itemize}
+            \item 
+        \end{itemize}
+
+    \section{Commands}
+        \begin{lstlisting}
+    // Nanite Proxy
+    r.Nanite.Proxy 1
+    // Nanite Mesh
+    r.Nanite.Mesh 1
+    // Nanite detail level (higher value lower resolution)
+    r.Nanite.DicingRate 8
+        \end{lstlisting}

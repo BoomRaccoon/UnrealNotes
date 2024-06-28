@@ -1,0 +1,60 @@
+\chapter{World Partitioning}
+    \href{https://www.youtube.com/watch?v=ZxJ5DG8Ytog}{YT-Reference}
+    \begin{itemize}
+        \item provides an automatic streaming system to load/unload cells based on distance
+        \item ENABLE: 'Project Settings' $\rightarrow$ 'Engine' $\rightarrow$ 'World Partition' $\rightarrow$ 'Enable World Partition'
+        \item any actor can specify if it should be loaded in their 'Details' under 'Grid Placement':
+        \begin{itemize}
+            \item Bounds: places the actor in all the grid cells that intersect its bounds volume
+            \item Location: paces the actor in the grid cell that contains the center point of their bounds volume
+            \item Always Loaded: always loads the actor
+        \end{itemize}
+    \end{itemize}
+    \uline{Settings}
+    \begin{itemize}
+        \item location: 'World Settings' $\rightarrow$ 'World Partition Setup'
+        $\rightarrow$ 'World Partition'
+        $\rightarrow$ 'Runtimehash'
+        $\rightarrow$ 'Runtime Hash'
+        $\rightarrow$ 'Runtime Settings' $\rightarrow$ ...
+        \item enable 'Preview Grids'
+    \end{itemize}
+    \uline{Advantages:}
+    \begin{itemize}
+        \item meshes get replaced with their proxies at runtime
+        \item COMMANDS:
+        \begin{itemize}
+            \item 'wp.Runtime.HLOD 0' will disable all hlods
+            \item 'wp.Runtime.ToggleDrawRuntimeHash2d'
+        \end{itemize} 
+    \end{itemize}
+    \begin{figure}
+        \includegraphics[width=\textwidth]{WorldPartition_Draw2d.jpg}
+        \caption{Visualisation which cells are loaded. Green:=loaded cells; Red:=unloaded cells}
+    \end{figure}
+
+    \section{Data-Layers}
+        \begin{itemize}
+            \item are a way to group actors independent of the cells
+            \item they are availbale in BPs as the 'Data Layer Subsystem'-Node
+            \item they can be:
+            \begin{itemize}
+                \item Activated
+                \item Preloaded
+                \item Unloaded
+            \end{itemize}
+            \item old content can be unloaded and removed from memory $\rightarrow$ 'Flush Level Streaming'
+        \end{itemize}
+
+    \section{Packed-Level-Instances/Prefabs}
+        \begin{itemize}
+            \item are BPs that group together multiple InstancedStaticMeshes
+            \item has RC options like:
+            \begin{itemize}
+                \item Edit $\rightarrow$
+                \item Break ... $\rightarrow$
+                \item Update Packed Blueprint
+                \item Create from selection ...
+            \end{itemize}
+        \end{itemize}
+        

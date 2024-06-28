@@ -1,0 +1,128 @@
+\chapter{Blueprints}
+    \section{Notes}
+        \begin{itemize}
+            \item What to use:
+            \begin{itemize}
+                \item Sender $\rightarrow$ Receiver = Direct communication || Interface
+                \begin{itemize}
+                    \item When you know everything about the communication except the time
+                    \item which objects are part of the communication
+                \end{itemize}
+                \item Listening Receiver = Event Dispatcher
+            \end{itemize}
+            \item BlueprintPure := just executes the function without the need for input of timing
+            \item 
+            \item Removing objects from an array will break in normal forEachLoop (abcde $\rightarrow$ remove c $\rightarrow$ you skip d \& end up at e)
+        \end{itemize}
+
+
+    \section{Blueprint Communication}
+        Basics of BP communication:
+        \begin{itemize}
+            \item UE4 has no broadcast functionality
+            \item there is always a sender \& receiver involved
+            \item $\rightarrow$ at least one participant has to know about the other via REFERENCE
+        \end{itemize}
+        Types of communication
+        \begin{itemize}
+            \item Direct-Communication: one to one with known participants and functionality
+            \item Interfaces: functionality without of Implementation 
+        \end{itemize}
+\smallskip
+        CASTING: is a way to test if some object has class specific functionality/properties \\
+\smallskip
+    \subsection{Interface}
+        Are assets themself \\
+        \begin{itemize}
+            \item RC in content browser Blueprints $\rightarrow$ Blueprint-Interface
+            \item You can't make anything in the graph except selecting the function
+            \item You'll add functions and properties on the right side
+            \item Click the specific function you want to add Input/Output to it
+            \item 
+            \item Add to BPs: under 'Class Settings' $\rightarrow$ 'Details' $\rightarrow$ 'Interfaces' $\rightarrow$ add your interfaces
+            \item 
+        \end{itemize}
+
+
+    \subsection{Event Dispatcher (Publish-Subscribe)}
+        \begin{itemize}
+            \item Create a dispatcher
+            \item Call the dispatcher on an event (ex. key press)
+            \item Bind something to the dispatcher (adding a delegate) so it will be executed when dispatcher gets called
+            \item Hint: it has only to be bound once $\rightarrow$ ex. construct event
+        \end{itemize}
+
+        You attach a disptacher to the sender. It can have inputs to send with the message \\
+        When the sender wants to send a message he has to call the dispatcher \\
+        The receiver makes a reference to the sender (In contrast to the other communication types) \\
+        Then anyone can subscribe(bind)/unsubscribe(unbind) to the sender, to acknowledge the message and react to it. \\
+        In an Event-Dispatcher-Map := are the rules defined to handle the event \\
+        \includegraphics[width=\textwidth]{EventDispatcher.png} \\
+        After creating dispatcher you can
+        \begin{itemize}
+            \item Add nodes:
+            \item Bind nodes: bind a specific 'Custom Event' so it fires in response to the Dispatcher
+            \item Unbind nodes: unbind a specific 'Custom Event' from a Dispatcher so you're not longer listening
+                \begin{itemize}
+                    \item from Class Blueprint $\rightarrow$ will unbind all
+                    \item from Level Blueprint $\rightarrow$ unbind just for the target
+                \end{itemize}
+            \item Unbind all: will unbind all Events from the Dispatcher
+            \item Call: will broadcast/publish to every receiver
+            \item Event: adds a custom event with a signature matching the event dispatcher
+            \item Assign: bind + assign/create new event
+        \end{itemize}
+\smallskip
+        \underline{Event Types:}
+        \begin{itemize}
+            \item OnClick
+            \item OnOverlap
+            \item  
+        \end{itemize}
+
+
+    \section{Useful BP Nodes}    
+        \begin{itemize}
+            \item Add Controller Yaw (Rechts-Links) \& Add Controller Pitch(Up-Down) 
+            \item Branch = if-else
+            \item Gate := 
+            \item Timeline
+            \item CastToGenericCharacter
+            \item SetTimerByFunction / SetTimerByEvent \href{https://docs.unrealengine.com/en-US/Gameplay/HowTo/UseTimers/Blueprints/index.html}{Additional Info and nodes}
+        \end{itemize}
+        \includegraphics[width=\textwidth]{CameraControl.png} \\
+        \includegraphics[width=\textwidth]{MovementControl.png} \\
+        Zu beachten ist hier das beim ''CameraControl'' in Details des ''BP\_Character''
+        unter den Details des ''Camera Component'' ''Camera Options'' $\rightarrow$ ''Use Pawn Control Rotation'' angekreuzt werden muss \\
+
+        \subsection{SetActorLocation}
+        \subsection{SetActorRotation}
+        \subsection{SetActorLocationAndRotation}
+        \subsection{Construct Object from Class}
+        \subsection{Add Force}
+        \subsection{Events}
+            There a a lot of different Events that can be used in BPs \\
+            \includegraphics[width=\textwidth]{Events.png} \\
+        \subsection{Timeline}
+            The Timeline can output values depending on the time.
+            \begin{itemize}
+                \item Use Last Keyframe := will set the last Keyframe as the END
+            \end{itemize}
+
+        \subsection{Open Level}
+            Will open the level you specify in the name box \\
+        \subsection{Load Level Instance}
+        \subsection{IsValid}
+            Checks if the specified return value is NULLPTR
+        \subsection{All trace functions}
+    
+    \section{Traces/Ray-Casting}
+        \begin{itemize}
+            \item Create a node for (Multi)Line-Traces (ByChannel, ByObject,ByProfile)
+            \item Get the location of the thing you want the line trace to be cast from and plug into start
+            \item get rotation of it and 'GetForwardVector' which creates a unified Vector which needs to be multiplied by the distance
+            \item then add unified vector multiplied by the distance to the start location and plug into end
+            \item Draw Debug Type For One Frame
+        \end{itemize}
+        There are different types of Ray-Casting \\
+        \subsection{Single Ray-Cast-by-channel}

@@ -1,0 +1,201 @@
+\chapter{Optimization}
+    \section{General}
+    \begin{itemize}
+        \item DISABLE EVENT TICK ON EVERY CLASS in the class defaults
+        \item 
+        \item Unreal engine has a SetTransform and SetActorLocationAndRotation calls, that let you change rotation and location in 1 call instead of 2. Calling SetActorLocationAndRotation is twice faster than calling SetLocation and SetRotation separately.
+        \item 
+        \item check what the current bottleneck is with 'stat unit' command BUT
+        \item unreal insight gives a much better view
+        \item 
+        \item easiest way to tell is to just look at stat unitgraph from the packaged game
+        \item 
+    \end{itemize}
+
+    \section{Profiling (Identify bottlenecks/problems)}
+        \subsection{Texture streaming metrics}
+                \begin{lstlisting}
+            stat streaming sortby=name maxhistoryframes=1                
+                \end{lstlisting}
+
+        
+            \begin{table}[!htb]
+                \begin{tblr}{p{6cm} | p{12cm}}
+                    \hline
+                        Command & Description \\
+                    \hline
+                    memreport -full & \makecell{will print all currently loaded assets} \\
+                    obj list Class=AnimSequence & \makecell{used to list all loaded assets of a class} \\
+                    'stat unit' Game(altering position/rotation)(==CPU)\{Animations, Physics, Collision, AI, Spawning/Destroying ,...\} GPU(any rendering) \{Lighting, Redering of models, Refelctinos, shaders, ...\}
+                    't.maxfps = [NUMBER]' & set fps limit \\
+                    'stat rhi' & shows things like triangles drawn, draw primitive calls ... \\
+                    'stat r' & \\
+                    'stat scenerendering' & \\
+                    'stat fps' & \\
+                    'r.shadowquality [NUMBER]' && sets the shadow quality \\
+                    'stat init views' & \\
+                \end{tblr}
+            \end{table}
+        
+                
+                
+    \section{Insights}
+        \begin{itemize}
+            \item is located in the \code{Engine/Binaries/[Platform]/UnrealInsights.exe}
+            \item or binary build in \code{Engine/Build/BatchFiles/RunUBT.bat UnrealInsights Win64 Development}
+            \item 
+            \item \code{Trace} :=
+            \begin{itemize}
+                \item structured logging framework
+                \item 
+            \end{itemize}
+            \item 
+        \end{itemize}
+        
+        \subsection{adding arguments to visual studio}
+            \begin{itemize}
+                \item \code{RC} on the game project $\rightarrow$ \code{Properties}
+                \item \code{Debugging} $\rightarrow$ \code{Command Arguments}
+                \item $\hookrightarrow$ add your arguments
+                \item default is: \code{\$(SolutionDir)FightForFame.uproject" -skipcompile}
+                \item you can add something like: \\
+                \code{\"\$(SolutionDir)FightForFame.uproject\" -skipcompile -trace=default,memory}
+            \end{itemize}
+
+TRACE\_CPUPROFILER\_EVENT\_SCOPE();
+SCOPE\_CYCLE
+TRACE\_BOOKMARK
+
+
+Editor Preferences -> Play in Standalone Game -> Additional Launch Parameters "-cpuprofilertrace" "-loadtimetrace"
+
+
+    \section{Instanced Static Mesh\& Hierarchical Instanced Mesh}
+        \includegraphics[width=\textwidth]{InstancedStaticMesh.png} \\
+        \underline{General}
+        \begin{itemize}
+            \item First create a single mesh from multiple meshes (RC $\rightarrow$ convert actors to static mesh)
+        \end{itemize}
+        !!! Transforms have to be the same for all instances !!!
+        \begin{itemize}
+            \item Have no LOD
+        \end{itemize}
+        \underline{That's where HLOD come into play}
+        \begin{itemize}
+            \item Creates an instance for every LOD
+            \item scale has always to be 1.0 ?
+        \end{itemize}
+
+    \section{HLOD}
+        \begin{itemize}
+            \item Groups multiple objects into one single object
+        \end{itemize}
+
+    \section{Code Profiling}
+
+
+    \section{Reference Viewer}
+        \begin{itemize}
+            \item \code{open:} 'RC' on an asset and select \code{Reference Viewer} in the content browser
+        \end{itemize}
+
+
+    \section{Obejct/Class/Hard Reference VS SoftReference}
+        \begin{itemize}
+            \item SoftReferences have to be cast into the class they will be used as
+            \item 
+        \end{itemize}
+
+
+    \section{Common problems and solutions}
+        \begin{table}[!htb]
+            \begin{tabular}{p{5cm}|p{5cm}}
+                \hline
+                    Problem & Solution \\
+                \hline
+                too many polygons & LODs \\
+                too many skeletal meshes are animating & Animation budget allocator \\
+                & \\
+                memory & use pooling to reduce object creation/deletion \\
+                too many unit calculations & cluster the units \\
+                & Animation Sharing Manager \\
+                Memory pool & check loaded textures \\
+                \hline
+            \end{tabular}
+        \caption{ caption }  
+        \end{table}
+
+
+
+
+    \section{Textures}
+        \begin{itemize}
+            \item streaming virtual textures are good to use with big textures of which some part will probably not be visible in the near future
+            \item Enable Crunch compression: will reduce the memory usage (use probably always)
+            \item can be enabled automatically for new imported textures
+            \begin{itemize}
+                \item Project Settings > Texture Import > Virtual Textures category 
+                \item Auto Virtual Texturing Size
+            \end{itemize}
+            \item 
+        \end{itemize}
+
+
+    \section{Monitor performance}
+        \begin{itemize}
+            \item put a QUICK\_SCOPE\_CYCLE\_COUNTER(STAT\_MyRotationFunction)
+            \item $\rightarrow$ use \code{stat quick} to check it
+        \end{itemize}
+
+
+    \section{Significance Manager}
+        \begin{itemize}
+            \item only provides the framework for determining the significance of an Object $\rightarrow$ actual calculation to be defined by the project
+            \item functions that will be called on the Object during Significance Manager updates and must be registered:
+            \begin{itemize}
+                \item \code{FSignificanceFunction}: primary evaluation function; takes \code{Object} and a single \code{Transform};  calculates and returns the significance as a float. During the Significance Manager's update process, this function will be called once for each Transform that was passed in. The final result will be determined by the Significance Manager's Update function; by default, it will be the highest value. Each registered Object is required to be associated with a function of type FSignificanceFunction when it is registered. 
+                \item \code{FPostSignificanceFunction}: 
+            \end{itemize}
+            \item ways to get significance of an object:
+            \begin{itemize}
+                \item \code{GetSignificance}: returns a significance value
+                \item \code{QuerySignificance}: returns \code{false} if the object is not registered
+            \end{itemize}
+            \item \code{Update}:
+            \begin{itemize}
+                \item does not run automatically 
+                \item good place to call it in an overridden version of UGameViewportClient
+                \item 
+            \end{itemize}
+        \end{itemize}
+
+
+    
+
+
+    \begin{lstlisting}
+    #include "MyGameViewportClient.h"
+    #include "SignificanceManager.h"
+    #include "Kismet/GameplayStatics.h"
+    void UMyGameViewportClient::Tick(float DeltaTime)
+    {
+        // Call the superclass' Tick function.
+        Super::Tick(DeltaTime);
+        // Ensure that we have a valid World and Significance Manager instance.
+        if (UWorld* World = GetWorld())
+        {
+            if (USignificanceManager* SignificanceManager = FSignificanceManagerModule::Get(World))
+            {
+                // Update once per frame, using only Player 0's world transform.
+                if (APawn *PlayerPawn = UGameplayStatics::GetPlayerPawn(World, 0))
+                {
+                    // The Significance Manager uses an ArrayView. Construct a one-element Array to hold the Transform.
+                    TArray<FTransform> TransformArray;
+                    TransformArray.Add(PlayerPawn->GetTransform());
+                    // Update the Significance Manager with our one-element Array passed in through an ArrayView.
+                    SignificanceManager->Update(TArrayView<FTransform>(TransformArray));
+                }
+            }
+        }
+    }
+    \end{lstlisting}

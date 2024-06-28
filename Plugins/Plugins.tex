@@ -1,0 +1,166 @@
+\chapter{Plugins}
+
+    \section{Unsorted Notes}
+        \begin{itemize}
+            \item a game feature plugin "knows" about the game but the game doesn't know about game features
+            \item a game knows about plugins but plugins don't know about the game
+            \item a game feature knows about a plugin since it can depend on
+        \end{itemize}
+
+    \section{Enable/Disable Default plugin}
+        \begin{itemize}
+            \item simply edit the \code{.uplugin-file}
+            \item add/remove \code{\"EnabledByDefault\": true,}
+        \end{itemize}
+
+    \section{Plugin Structure}
+        \uline{\textbf{In File-Explorer:}}
+        \begin{itemize}
+            \item Binaries: compiled binaries (dll and debug databases)
+            \item Content:
+            \item Intermediat: contains temporary files
+            \item Source: contains the source code
+            \item Resources: files that the plugin needs (for example the icon \colorbox{mygray}{\lstinline{Icon128.png}} with a size of 128x128)
+            \item 
+            \item $[PluginName].uplugin$: JSON-file containing the information of the plugin and used by the engine to register the plugin
+        \end{itemize}
+
+        \uline{\textbf{Plugin-Locations:}}
+        \begin{itemize}
+            \item Engine: $[UE4 Root]/Engine/Plugins/[Plugin Name]/$
+            \item Game: $[Project Root]/Plugins/[PluginName]/$
+        \end{itemize}
+
+        \uline{\textbf{Plugin-Configuration-Location:}}
+        \begin{itemize}
+            \item Engine plugins: $[PluginName/]/Config/Base/[PluginName].ini$
+            \item Game plugins: $[PluginName]/Config/Default/[PluginName].ini$
+        \end{itemize}
+
+        \uline{\textbf{Possible Plugin Dependencies}} \\
+        \includegraphics[width=\textwidth]{PluginDependencies.jpg}
+
+        \section{Create Plugins}
+            How to create new plugins: \\
+            \includegraphics[width=\textwidth]{CreateNewPlugin.png} \\
+            Everything will be setup if created this way \\
+            \underline{Filestructure:}
+            \begin{itemize}
+                \item Will be placed in the Plugin folder of the project
+                \item has the basic structure
+                \item code itself is placed in 'Source'
+                \item 'Source' $\rightarrow$ 'Public' + 'Private'
+                \item every module needs it's own build file
+                \item \textbf{Content-Plugin:} "CanContainContent" setting within the Plugin's descriptor must be set to "true"
+            \end{itemize}
+            
+            \uline{\textbf{Types:}}
+            \begin{itemize}
+                \item Runtime: will always be loaded (even in shipped games)
+                \item RuntimeNoCommandlet:
+                \item Developer: development runtime or editor builds but never in shipped games
+                \item Editor: only when editor is starting up
+                \item EditorNoCommandlet:
+                \item Program:
+            \end{itemize}
+
+    \section{Plugin-Descriptor-File}
+        \begin{itemize}
+            \item has the \colorbox{mygray}{\lstinline{.uplugin}}-extension
+            \item JSON-format
+            \item 
+        \end{itemize}
+        \uline{\textbf{Example of a plugin descriptor-file}}
+        \begin{lstlisting}
+    {
+        "FileVersion" : 3,
+        "Version" : 1,
+        "VersionName" : "1.0",
+        "FriendlyName" : "UObject Example Plugin",
+        "Description" : "An example of a plugin which declares its own UObject type.  This can be used as a starting point when creating your own plugin.",
+        "Category" : "Examples",
+        "CreatedBy" : "Epic Games, Inc.",
+        "CreatedByURL" : "http://epicgames.com",
+        "DocsURL" : "",
+        "MarketplaceURL" : "",
+        "SupportURL" : "",
+        "EnabledByDefault" : true,
+        "CanContainContent" : false,
+        "IsBetaVersion" : false,
+        "Installed" : false,
+        "Modules" :
+        [
+            {
+                "Name" : "UObjectPlugin",
+                "Type" : "Developer",
+                "LoadingPhase" : "Default"
+            }
+        ]
+    }
+\end{lstlisting}
+
+        \subsection{Module-Descriptors}
+            \href{https://docs.unrealengine.com/4.27/en-US/API/Runtime/Projects/FModuleDescriptor/}{off. API}
+            \begin{itemize}
+                \item valid type options are:
+                \begin{itemize}
+                    \item Runtime := even in shipped games
+                    \item RuntimeNoCommandlet
+                    \item Developer := development build or editor build
+                    \item Editor
+                    \item EditorNoCommandlet
+                    \item Program
+                \end{itemize}
+            \end{itemize}
+        \uline{\textbf{Example of a Module-Descriptor}}
+        \begin{lstlisting}
+    {
+        "Name" : "UObjectPlugin",
+        "Type" : "Developer"
+        "LoadingPhase" : "Default"
+    }
+        \end{lstlisting}
+
+    \section{Bare Minimum}
+        \begin{itemize}
+            \item EditorModule has to derive from IModuleInterface
+            \item implement 'StartupModule()' \& 'ShutdownModule()'
+            \item 
+        \end{itemize}
+
+    \section{Useful Modules}
+        \begin{itemize}
+            \item UnrealEd:
+            \item SlateCore
+            \item Slate
+            \item ContentBrowser
+            \item PropertyEditor
+            \item LevelEditor
+            \item DetailCustomizations
+        \end{itemize}
+
+    \section{Create a Asset Type}
+        \begin{itemize}
+            \item First declare a assset types C++ class
+            \item add factories to create instances of the asset
+            \item customize asset appearence
+            \item add asset specific content browser action
+            \item add custom asset editor UI
+        \end{itemize}
+
+    \section{Add Factory}
+        \begin{itemize}
+            \item UFactory
+            \item different types: Content Browser Context Menu, Content Browser Drag \& Drop
+        \end{itemize}
+
+    \section{Publish a Plugin}
+        \begin{itemize}
+            \item files/folders you will have to send to epic:
+            \begin{itemize}
+                \item \code{YourPlugin.uplugin}-file
+                 \item \code{Resources}-folder
+                 \item \code{Source}-folder
+                 \item no build files
+            \end{itemize}
+        \end{itemize}

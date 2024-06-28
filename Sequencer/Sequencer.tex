@@ -1,0 +1,38 @@
+\chapter{Sequencer}
+\label{chap:Sequencer}
+    section{Overview}
+        \begin{itemize}
+            \item \code{Level Sequence Asset}: contains tracks, cameras, keyframes and animations
+            \item \code{Level Sequence Actor}: is an actor that can be placed in the world and references a Level Sequence Asset
+            \item \code{Camera Cuts}: are used to switch between cameras in a sequence
+            \item \code{Master Sequence}: is a sequence that contains other sequences
+            \item \code{Shots}: are the sequences that make up the Master Sequence
+            \item \code{Track} : is a container for  \code{property}- \code{component}-tracks
+            \item \code{Object Binding Track} : is a track that allows you to bind an object to a track
+            \item \code{Section} : is a container for \code{Keyframes}
+            \item 
+        \end{itemize}
+
+        \section{Master Sequence}
+            \begin{itemize}
+                \item \code{Master Sequence}: is a sequence that contains other sequences
+                \item \code{Shots}: are the sequences that make up the Master Sequence
+                \item 
+            \end{itemize}
+
+        \section{Execute code (Event Track)}
+            \begin{itemize}
+                \item \code{Event Track} : you can define frames in your sequence where you want to execute Blueprint Scripting functionality
+                \item types:
+                    \begin{itemize}
+                        \item \code{Trigger} : evaluate on the same frame as the keyframe
+                        \item \code{Repeater} : evaluate on each frame for the duration of the event section (FPS of the sequence will influence it)
+                    \end{itemize}
+                \item \code{adding} : use +Track $\rightarrow$ Event $\rightarrow$ and select the type to add
+                \item after that you can add additional \code{Sections}
+            \end{itemize}
+
+        \section{Director Blueprint}
+            \begin{itemize}
+                \item \code{Director Blueprint} : is a Blueprint that can be used to add logic to a sequence
+            \end{itemize}

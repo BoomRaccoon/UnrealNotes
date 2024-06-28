@@ -1,0 +1,145 @@
+\begin{landscape}
+    \chapter{Unreal-CPP Cheatsheet}
+    \begin{tcolorbox}[title=Basics, colframe=violet!95, colback=violet!45, center title]
+        \begin{multicols}{2}
+            PREFIXES:
+            \begin{lstlisting}
+F // Struct
+T // Template
+U // UObject
+A // AActor
+S // SWidget
+I // Abstract interface
+E // Enums
+b // Booleans
+GA_ // GameplayAbility
+GE_ // GameplayEffect
+AN_ // AnimNotify
+W_ // Widget
+EUW_ // EditorUserWidget
+IA_ // InputAction
+PMI_ // PlayerMappableInput
+IMC_ // InputMappingContext
+FFE_ // ForceFeedbackEffect
+CS_ // CameraShake
+
+
+
+LastMouseCoordinates // displayed as 'Last Mouse Coordiants' in editor
+Last_Mouse_Coordinates // WRONG
+bIsFalling // 'Is Falling' checkbox in editor
+            \end{lstlisting}
+
+            STRINGS:
+            \begin{lstlisting}
+FString
+FName OneDataBaseEntry;
+FText TextLocalization;
+MyDogPtr->DogName = FName(TEXT("Samson));
+            \end{lstlisting}
+            
+            Conversion:
+            \begin{lstlisting}
+TestHUDString = TestHUDName.ToString();
+TestHUDText = FText::FromName(TestHUDName);
+TestHUDName = FName(*TestHUDString);
+TestHUDText = FText::FromString(TestHUDString);
+TestHUDString = TestHUDText.ToString();
+            \end{lstlisting}
+
+            UPROPERTY SPECIFIERS:
+            \begin{lstlisting}
+BlueprintReadOnly //Variable available from BPs
+BlueprintReadWrite //Variable available from BPs
+Category="TopCategory|SubCategory|..."
+Config #.ini file -> BlueprintReadOnly
+GlobalConfig
+EditAnywhere
+EditInstanceOnly //any visible instance in editor
+EditDefaultsOnly //Only the base
+VisibleInstanceOnly
+VisibleDefaultsOnly
+Category "Category1"
+Category "Category2 | SubCategory"
+            \end{lstlisting}
+            TARRAY FUNCTIONS:
+            \begin{lstlisting}
+Add() //might relocate the array in order to make it fit
+AddUnique() 
+Contains()
+CountBytes() // count bytes needed to serialize
+GetAllocatedSize()
+Heapify()
+
+            \end{lstlisting}    
+
+
+        \end{multicols}
+        \end{tcolorbox}
+\end{landscape}
+
+\newpage
+
+\begin{landscape}
+        \begin{tcolorbox}[title=Useful Actor Functions, colframe=violet!95, colback=violet!45, center title]
+            \begin{multicols}{2}
+            \begin{lstlisting}
+#include "Components/StaticMeshComponent.h"
+GetActorLocation()
+SetActorLocation(VeCtOr)
+RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("NaMe"));
+MeshComponent->SetupAttachment(GetRootComponent());
+Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+Camera->SetupAttachment(GetRootCOmponent());
+Camera->SetRelativeLocation();
+Camera->SetRelativeRotation();
+MeshComponent->AddForce(FVector(200000000.f,0.0f,0.0f));
+StaticMesh->AddTorque(FVector(FMath::FRandRange(2000000.f, 200000000.f),0.0f,FMath::FRand()));
+
+AutoPossessPlayer = EAutoReceiveInput::Player0;
+            \end{lstlisting}
+            PAWN functions
+            \begin{lstlisting}
+PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+            \end{lstlisting}
+            UPROPERTY SPECIFIERS:
+            \begin{lstlisting}
+
+            \end{lstlisting}
+        \end{multicols}
+        \end{tcolorbox}
+\end{landscape}
+
+
+\newpage
+
+\begin{landscape}
+        \begin{tcolorbox}[title=Debugging, colframe=violet!95, colback=violet!45, center title]
+            \begin{multicols}{2}
+            \begin{lstlisting}
+stat game // BP overall performance
+Dumpticks // show all ticking actors
+stat rhi //
+stat memory //
+stat scenerendering //
+stat engine //
+stat none //
+stat fps //
+DisableAllScreenMessages // ...
+SHIFT+L // toggle all stats
+
+            \end{lstlisting}
+            PAWN functions
+            \begin{lstlisting}
+
+            \end{lstlisting}
+            UPROPERTY SPECIFIERS:
+            \begin{lstlisting}
+
+            \end{lstlisting}
+        \end{multicols}
+        \end{tcolorbox}
+\end{landscape}

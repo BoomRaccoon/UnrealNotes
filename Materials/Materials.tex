@@ -1,0 +1,535 @@
+\chapter{Materials}
+\begin{itemize}
+    \item Component Mask node
+    \item Saturate instead of Clamp
+    \item 
+\end{itemize}
+
+    \section{Basics}
+        \includegraphics[width=\textwidth]{MaterialMaster.png} \\
+        \subsection{Math basics}
+            \begin{itemize}
+                \item Power := the black values grow (small values reach 0 much faster)
+                \item Multiply := 
+                \item VertexNormal := the direction the vertex is facing (gives a smooth look (Phong-shading))
+                \item FaceNormal := the direction the face is facing (gives a facetted look (Flat-shading))
+            \end{itemize}
+
+
+    \section{Material Expressions}
+        \begin{itemize}
+            \item 
+        \end{itemize}
+
+    \section{Virtual Texturing}
+        \begin{itemize}
+            \item divides textures into tiles of fixed size (typically 128x128)
+            \item analyse the pixels and only stream what's needed
+            \item loads only visible parts of the texture
+            \item closer $\rightarrow$ high-res
+            \item example usage = landscape (you only see a small part of the whole landscape/texture at a time)
+        \end{itemize}
+
+        \subsection{Runtime-Virtual-Texturing}
+            \begin{itemize}
+                \item fills in with GPU instead of texture from disk
+                \item render to cache and stream from it
+                \item size of virtual-texture
+            \end{itemize}
+            \textbf{\underline{Worflow}}
+            \begin{itemize}
+                \item enable 'Virtual Texture Streaming' on the texture
+                \item create rvt
+                \item create rvt-volume
+                \item material with 'Rutime-Virtual-Texture-Output' and 'Runtime-Virtual-Texture-Sample'
+                \item 
+                \item Far-Blend-Distance
+            \end{itemize}
+
+        \subsection{Runtime Virtual Texture}
+            \uline{Workflow:}
+            \begin{itemize}
+                \item create Virtual Textures for the heightmap and colormap of the landscape
+                \item depending of the usecase, change the 'Virtual Texture Content'
+                \item create Runtime 'Virtual Texture Volume'
+                \item drag the RVT into the 'Virtual Texture'-slot in the 'Virtual Texture Volume' details
+                \item add the 'Runtime Virtual Texture Output'-Node to the landscape material so you can write the info to VTs
+                \item add 2 VT slots on the landscape material and drag in the VTs
+                \item add the setup to blend with the VT to the desired Materials
+            \end{itemize}
+
+            \begin{figure}
+                \includegraphics[width=\textwidth]{RVT_Setup.jpg}
+                \caption{Node Setup for the RVT inside the Landscape material}
+            \end{figure}
+
+            \begin{figure}
+                \includegraphics[width=\textwidth]{VT-Material.jpg}
+                \caption{Blend Setup}
+            \end{figure}
+
+    \section{Material Domain}
+        Define the overall usage of a material and the attributes/nodes it has available (UI will also change preview in the material editor):
+        \begin{itemize}
+            \item Surface
+            \item UI
+            \item Post Process
+        \end{itemize}
+
+    \section{Transparency/Opcaity/Alpha Map}
+        Differentiated in vertex-alpha and pixel-alpha. Where vertex alpha is more coarse. \\
+        \underline{Methods:}
+        \begin{itemize}
+            \item Alpha-Blend: Has a wide range of transparency values $\rightarrow$ semi-transparency possible
+            \begin{itemize}
+                \item Overlapping alpha-blended meshes (paricles/grass) increase fill rate because same screen pixels are drawn again and again
+                \item Sorting problems
+            \end{itemize}
+            \item Alpha-Test: totally-hard-transparency with a threshhold to make mid-values transparent or solid
+            \begin{itemize}
+                \item no sorting problem
+                \item much faster than alpha-blend
+                \item no AA $\rightarrow$ pixelly
+            \end{itemize}
+        \end{itemize}
+
+    \section{Constant Material Instance/Dynamic Material Instance}
+        \begin{itemize}
+            \item Constant Material Instance: is a material-instance with non-changing parameters
+            \item Dynamic Material Instance: is a material-instance with changing parameters. Achieved by BP-Node 'Create Dynamic Material Instance' or code
+        \end{itemize}
+
+    \section{World Displacement}
+        The object bounds will not be changed. \\
+
+
+    \section{Vertex Shader}
+        \begin{itemize}
+            \item in order to execute code on the Vertex-Shader use the \code{VertexInterpolator}-Node 
+            \item 
+        \end{itemize}
+
+    \section{World Position Offset}
+
+
+    \section{Render Targets}
+        \begin{itemize}
+            \item storing buffers for deferred renderer
+            \item display complex effects (ripples on water)
+        \end{itemize}
+        \subsection{Create Render Targets}
+            \begin{itemize}
+                \item are a asset type
+                \item $\curvearrowright$  $\rightarrow$ Render Target
+                \item Blueprint:
+                \begin{itemize}
+                    \item ok
+                \end{itemize}
+            \end{itemize}
+
+        
+    \section{Tessellation}
+        \subsection{Flat-Triangles}
+
+        \subsection{PN-Triangles}
+
+    \section{Parallax Occlusion Mapping}
+        Is like a Bump-Map but a lot better \\
+        Has a dedicated node in the material editor \\
+
+
+    \section{Vertex-Color-Material}
+        \begin{itemize}
+            \item Add a 'Vertex Color'-Node to change something (Simplest is to multiply it with the 'Base-Color'-Values)
+            \item Then in 'Paint-Mode' make sure Mode = Colors (Not Blend Weights)
+            \item Select the channel you want to paint on !!!
+        \end{itemize}
+
+    
+    \section{Material Layers}
+        \uline{Solves what problem?:} 
+        \begin{itemize}
+            \item per-pixel control over where Materials are placed, then use layered Material functions or Material Layers.
+            \item Simplify large and complex setups into custom nodes to make these operations reusable and graphs using them esier to read
+        \end{itemize}
+        \uline{When Shouldn't you use them?}
+        \begin{itemize}
+            \item 
+            \item can be heavy in terms of performance, if the Materials used in layer functions are complex themselves
+            \item all your layers are rendered simultaneously, and then blended $\rightarrow$
+            \begin{itemize}
+                \item you have four layers in a Material
+                \item engine tests for each pixel of object to see which is blended
+                \item then reject any not in use
+            \end{itemize} 
+            \item Layered Material is generally too heavy for this to be used on mobile platforms
+            \item more Material Elements increase draw calls, but are generally much more efficient $\rightarrow$ multiple Materials instead of using a Layered Material
+        \end{itemize}
+
+        \begin{itemize}
+            \item create a 'Material Layer asset' and add 'MakeMaterialAttributes' node == where you define parameters and where they go
+            \item create 'Material Layer Blend Asset' == where the actual blending is defined
+            \item Create 'Material'
+            \item add 'Material Attribute Layers' Node 
+            \item create 'Material Instance' of the Base Material and enable the 'Use Material Attributes' property
+            \item use 'Layer Parameters'
+        \end{itemize}
+
+        \begin{itemize}
+            \item Create a new Material Function and edit the node graph to perfection. This function will act as a layer when you call it in your base Material.
+            \item Connect your node network to a new Make Material Attributes node, and connect it to the Function output.
+            \item Save the Material Function.
+            \item Repeat this process for any other Material Function layers you wish to create.
+            \item Create a new Material and open it in the Material Editor.
+            \item Drag your Material Functions from the Content Browser into the new Material to use as layers.
+            \item Blend multiple Material Functions together using the Material Layer Blend functions. 
+        \end{itemize}
+
+        \begin{figure}
+            \includegraphics[width=\textwidth]{MaterialLayerAssetGraph.png}
+            \caption{Node Setup for a 'Material Layer'-Asset}
+            %\label{fig:MaterialLayer}
+        \end{figure}
+
+        \begin{figure}
+            \includegraphics[width=\textwidth]{MaterialLayerBlendAssetGraph.png}
+            \caption{Basic 'Material Blend' setup}
+            %\label{fig:MaterialBlend}
+        \end{figure}
+
+
+    \section{Post Process Material}
+        \begin{itemize}
+            \item are used to apply effects to the screen after the scene has been rendered
+            \item NOT for effects like color correction or adjustments, bloom, depth of field, and various other effects, you should use the settings inherent to the Post Process Volume
+            \item \code{Material Domain} : has to be set to \code{Post Process}
+            \item \code{Blendable Location}:
+            \begin{itemize}
+                \item \code{Before Tonemapping}:  	
+                        all lighting is provided in HDR with scene color when Scene Texture expression's Post Process Input 0
+                        is used. It fixes issues with temporal anti-aliasing (TAA) and GBuffer lookups. For example,
+                        issues that can happen when using depth and normals.
+                \item \code{After Tonemapping}:
+                    This option indicates that post processing will take place after tonemapping
+                    and color grading has been completed. It is the preferred location \textbf{for performance}
+                    since the color is LDR and requires less precision and bandwidth. When this option is selected,
+                    the SceneTexture expression's Post Process Inputs 2 and 3 are used to control where
+                    Scene Color is in the pipeline.
+                    Input 2 applies scene color before tonemapping.
+                    Input 3 applies scene color after tonemapping.
+                \item \code{Before Translucency}: This is even earlier in the pipeline than 'Before Tonemapping' before translucency was combined with the scene color. Note that SeparateTranslucency is composited later than normal translucency.
+                \item \code{Replacing the Tonemapper}: PostProcessInput0 provides the HDR scene color, PostProcessInput1 has the SeparateTranslucency (Alpha is mask), PostprocessInput2 has the low resolution bloom input.
+            \end{itemize}
+            \item \code{Custom Depth} := adds extra draw calls; can be actiuvated on the mesh
+        \end{itemize}
+
+        \subsection{Useful nodes}
+            \begin{itemize}
+                \item \code{SceneTexture}: to access the scene color, depth, normals, etc.
+                \item \code{SceneColor}: to access the scene color
+                \item \code{SceneDepth}: to access the scene depth
+                \item \code{ViewSize}: gives the size of the viewport
+            \end{itemize}
+
+
+        \subsection{Creating a outline}
+            \begin{itemize}
+                \item create \code{PostProcess Volume}
+                \item set \code{Extends Infinite}
+                \item 
+                \item \code{Actors} need \code{Render Custom Depth Pass} to be enabled
+                \item 
+                \item Create \code{Material} for the postprocess
+                \item use \code{Scene-Texture}-Node
+                \item set \code{Scene-Texture-Id} to \code{CustomDepth}
+                \item Divide the CustomDepth by a big number
+                \item clamp it between 0-1
+                \item 
+            \end{itemize}
+
+        
+
+    \section{Decal}
+        Project Settings $\rightarrow$ Engine $\rightarrow$ Rendering $\rightarrow$ DBuffer Decals \\
+        CameraDirectionVector * Offset into 'World Position Offset' \\
+        Blend Modes \\
+        Receive Decals Decal \\
+        Sort Order \\
+        Animated Decal Material \\
+
+    \section{Landscape Material}
+        \subsection{Basic Setup}
+            \begin{itemize}
+                \item create material
+                \item create material
+            \end{itemize}
+        %\label{material_landscape}
+        \subsection{Landscape specific nodes}
+            \begin{itemize}
+                \item LandscapeLayerBlend: enables to blend together multiple textures or material networks to be used as landscape layers.
+                \item LandscapeGrassOutput
+                \item LandscapeLayerSample
+                \item LandscapeLayerSwitch: to exclude material operations if a layer is not present (weight=0)
+                \item LandscapeLayerWeight: allows material network blending, based on the weight on the landscape material (layer weight as blending alpha)
+                \item LandscapeVisibilityMask: to add holes in a landscape (connected to opacity mask material input)
+            \end{itemize}
+
+        \subsection{Blend Modes (LandscapeLayerBlend)}
+            \underline{LB Weight Blend:}
+            \begin{itemize}
+                \item if layer coming from an external program (ex. world machine) 
+                \item painting layers independently from another
+                \item without layer order
+            \end{itemize}
+            \underline{LB Alpha Blend:}
+            \begin{itemize}
+                \item painting in detail
+                \item defined layer order
+                \item ex. snow over rock and grass
+            \end{itemize}
+            \underline{LB Height Blend:}
+            \begin{itemize}
+                \item like LB Weight Blend
+                \item adds detail to the transition between layers based on height map
+                \item ex. dirt in the gaps of rocks
+            \end{itemize}
+
+        \subsection{Grass}
+        \subsection{Auto Landscape}
+            \begin{itemize}
+                \item Select 3 materials from the 'Auto\_Landscape' 'Materials'-Folder
+                \item migrate them into the desired project
+                \item create a material instance of the 'M\_Auto\_Landscape'
+                \item add textures to the materials 'Material\_A' (slopes) 'Material\_B' (Grass) ...
+                \item adjust Material properties like tiling, Cell Bombing, Specular, Triplanar Projection (Slopes), Use Normal Map Blend, Z\_Slope\_Bias
+                \item Add Foliage:
+                \begin{itemize}
+                    \item Use imported 'Landscape\_Grass\_Type'-Asset or create a new one
+                \end{itemize}
+            \end{itemize}
+             \includegraphics[width=\textwidth]{Auto_Landscape_1.jpg}
+
+    \section{Physics Material}
+        \begin{itemize}
+            \item describes the properties of a material
+            \item is set on in the details of the material output under 'Physical Material' 
+        \end{itemize}
+
+    \section{Example setups}
+        \subsection{Moving Distortion (Water effect)}
+            The basic concept is that the uv-coordinates move around
+            in order to make it look like the surface is moving. \\
+            \includegraphics[width=\textwidth]{MovingDistortionShader.png} \\
+
+
+        \subsection{Swaying Grass}
+            \begin{itemize}
+                \item Use 'SimpleGrassWind' node
+                \begin{itemize}
+                    \item WindWeight: grayscale map to specifying influence weight
+                    \item AdditionalWPO: takes in additional world position offset network or function
+                \end{itemize} 
+            \end{itemize}
+
+
+        \subsection{Glass}
+            \uline{High-Quality}
+            \begin{itemize}
+                \item \code{Blend Mode} = \code{Translucent}
+                \item 
+                \item 
+            \end{itemize}
+
+            \uline{Low-Quality}
+            \begin{itemize}
+                \item \code{Blend Mode} = \code{Additive} or \code{Modulate}
+            \end{itemize}
+    \section{Hotkeys}
+        \begin{itemize}
+            \item T: TextureSample
+            \item U: TextureCoordinates
+            \item 1-4: Vector
+            \item A: Add
+            \item M: Multiply
+            \item D: Divide
+            \item S: Skalar Parameter
+            \item CTRL: click on output to drag all connectors
+            \item O: 1-x
+        \end{itemize}
+
+    \section{Node Reference}
+        \begin{table}[H]
+            \begin{tabular}{|c|c|}
+                \hline
+                    Node & Description \\
+                \hline
+                    Mask & Seperate values (for example rgb or a V3) \\
+                    CheapContrast & negative: moves to white, positive: moves to black; works only on one channel \\
+                    ChecpContrastRGB & works on all channels \\
+                    ComponentMask & specify which channels you want to use \\
+                    Clamp & Min-Max \\
+                    LinearInterpolate & Output value between A and B depending on the Alpha \\
+                    If & ... \\
+                \hline
+            \end{tabular}
+        \end{table}
+
+
+    \section{Optimization for older hardware and mobile}
+        \begin{itemize}
+            \item In order to adjust a material to older hardware use the 'FEATURE LEVEL SWITCH'-node
+            \item there you can input different calculations for different feature levels
+        \end{itemize}
+
+
+    \section{Substance Designer}
+    \begin{itemize}
+        \item Create Material in substance designer
+        \item expose parameters you want to be editable
+        \item export sbsar
+        \item import into unreal 
+    \end{itemize}
+
+
+    \section{Curve Atlas (LUT)}
+        \begin{itemize}
+            \item used to put different gradients into one texture
+            \item no runtime support
+            \item should use size with power of 2
+        \end{itemize}
+
+
+    \section{Substrate}
+        \begin{itemize}
+            \item has to be enabled under \code{Plugins}
+            \item is a new way to render materials
+            \item makes working with translucency more straightforward 
+        \end{itemize}
+
+        \subsection{Basics}
+            \begin{itemize}
+                \item has a root node like the legacy materials where you can set material domain, blend mode, shading model, etc.
+                \item a \code{Substrate Shading Models}-Node (Substrate-Slab-BSDF) is the connected to the \code{Front Material}-Input on the root-node
+                \item  
+                \item a \code{Slab} is the basic building block of a substrate material
+                \item it consists of 2 parts:
+                \begin{itemize}
+                    \item \code{Interface}: is the boundry that interacts with light and is defined by defined by the \code{Roughness}, \code{Normal}, \code{Diffuse} \code{Albedo}, \code{F0} and \code{F90} 
+                    \item \code{Medium}: is beneath the interface where light is absorbed and scattered and is defined by Mean-Free-Path
+                \end{itemize}
+                \item Node-Types:
+                \begin{itemize}
+                    \item \code{BSDFs}: These nodes represent most types of surfaces, from simple materials to more complex ones like hair, eyes, and water.
+                    \item \code{Operators}: These nodes mix and layer multiple Substrate Slab BSDFs to create complex and varied surfaces.
+                    \item \code{Building-Blocks}: These nodes translate common material types for use with Substrate, like creating a coated layer or the default legacy material shading model of Unreal Engine.
+                    \item \code{Extras}: These nodes define a Material Domain for a Substrate Material, and are directly analogous to their legacy Material Domain namesakes.
+                    \item \code{Helpers}: These nodes are used to do some conversion within the material, such as mapping transmittance to Mean Free Path for a Substrate Slab.
+                \end{itemize}
+            \end{itemize}
+            \begin{figure}
+                \includegraphics[width=\textwidth]{substrate-slab-composition.png}
+                \caption{1 = Interface, 2 = Medium}
+                \label{}
+            \end{figure}
+            
+            \subsubsection{BSDFs}
+                \begin{figure}[!htb]
+                    \includegraphics[width=\textwidth]{substrate-bsdf-nodes.png}
+                    \caption{Available bsdf nodes}
+                    \label{}
+                \end{figure}
+                \begin{table}[!htb]
+                    \begin{tblr}{p{4cm} | p{12cm}}
+                        \hline
+                            Substrate-Slab-Input& Description \\
+                        \hline
+                            Diffuse Albedo      & \makecell[l]{ percentage of light reflected as diffuse from a surface. \\
+                                                                similar to the local base color of the medium \\
+                                                                default value = 0.18.} \\
+                            F0                  & \makecell[l]{ color and brightness of the specular highlight where the surface is \\
+                                                                perpendicular to the camera. dielectric Materials (non-metals) = 0 - 0.08 \\
+                                                                metallic Materials up to 1. Gemstones are in a range up to around 0.16.} \\
+                            F90                 & \makecell[l]{ color of the specular highlight where the surface normal is 90 degrees from the camera \\
+                                                                Only hue and saturation are perceived, as brightness is fixed at 1.0 \\
+                                                                This fades to black as F0 drops below 0.02.} \\
+                            Roughness           & \makecell[l]{ Defines the roughness of the surface. The default value is 0.5.} \\
+                            Anisotropy          & \makecell[l]{ Controls the anisotropy direction of the Material \\
+                                                                (-1: highlight aligned to the bi-tangent, 1: highlight is aligned with the tangent).} \\
+                            Normal              & \makecell[l]{ Defines the normal map of the surface.} \\
+                            Tangent             & \makecell[l]{ Take a surface tangent as input. The normal is considered tangent or world space \\
+                                                                according to the space properties on the material root node. \\
+                                                                This input defines the shading tangent per-pixel.} \\
+                            SSS MFP             & \makecell[l]{ Only used when there is no SS-Profile-Asset assigned to the root node \\
+                                                                Defines the distance light travels through the medium before being absorbed or scattered. \\
+                                                                The default value is 1.} \\
+                            SSS MFP Scale       & \makecell[l]{ density of the material $\rightarrow$ influences the absorption and scattering of light by the Material. \\
+                                                                defines the average distance at which a photon interacts with a particle of matter \\
+                                                                controlled per color channel. } \\
+                            SSS Phase Anisotropy& \makecell[l]{ Positive values elongate the phase function along the light direction $\rightarrow$ forward scattering.
+                                                                Negative values elongate the function backward along the light direction $\rightarrow$ back scattering.} \\
+                            Emissive Color      & \makecell[l]{ Defines the color of the light emitted by the Material.} \\
+                            Second Roughness    & \makecell[l]{ Controls the roughness of a secondary specular lobe \\
+                                                                does not influence diffuse roughness } \\
+                            Second Roughness Weight & \makecell[l]{ The mix factor between the primary and secondary specular lobe \\
+                                                                    0 renders the primary lobe only 1.0 renders the secondary lobe only.} \\
+                            Fuzz Roughness      & \makecell[l]{ Controls the roughness of the fuzz layer \\
+                                                                default value = Roughness-Input} \\
+                            Fuzz Amount         & \makecell[l]{ Adds a fuzz-like layer at the interface, causing color retroreflectivity \\
+                                                                amount of fuzz applied on top of a surface layer. Usually used to create fabric Materials.} \\
+                            Fuzz Color          & \makecell[l]{ Defines the color of the fuzz layer.} \\
+                            Glint Density       & \makecell[l]{ The logarithm representation of micro facet density on the surface of a material \\
+                                                                Requires r.Substrate.Glints=1 to be set in the ConsoleVariables.ini configuration file } \\
+                            Glint UVs           & \makecell[l]{ The UVs used to sample the glint texture \\
+                                                                Requires r.Substrate.Glints=1 to be set in the ConsoleVariables.ini configuration file } \\
+                        \hline
+                    \end{tblr}
+                \caption{ *MFP = Mean-Free-Path}  
+                \end{table}
+            
+            \subsubsection{Operators}
+                \begin{figure}
+                    \includegraphics[width=\textwidth]{substrate-operator-nodes.png}
+                    \caption{only for Substrate-Slab-BSDF and Substrate-Simple-Clear-Coat}
+                    \label{}
+                \end{figure}
+                
+                \begin{table}[!htb]
+                    \begin{tblr}{p{6cm} | p{12cm}}
+                        \hline
+                            Operator & Description \\
+                        \hline
+                            Substrate Coverage Weight   & \makecell[l]{ input from a Slab and controls the amount of coverage \\
+                                                                        Reducing the weight reduces the coverage of matter of the slab, \\
+                                                                        meaning you will see through to the matter underneath \\
+                                                                        should be used in conjunction with the Substrate Vertical Layer operator \\
+                                                                        to have opaque matter on top of another, like dust and dirt layers\\
+                                                                        where you want to control how much they cover the surface below.} \\
+                            Substrate Vertical Layer    & \makecell[l]{ input from two Slabs: a Top and Bottom layer. \\
+                                                                        The bottom Slab is coated by the top Slab with the bottom layer's appearance \\
+                                                                        influenced by the properties of the top layer. \\
+                                                                        Use the Top Thickness input to control how thick the top layer is over the bottom. \\
+                                                                        ideal for creating car paints, wood varnishes, and wetness on a surface.} \\
+                            Substrate Horizontal Blend  & \makecell[l]{input from two Slabs: a Background and Foreground. The Mix input controls how much these two Slabs mix together using a linear interpolation.} \\
+                            Substrate Add               & \makecell[l]{input from two Slabs and adds them together. The material created is not physically plausible because it creates more outgoing energy from the surface than incoming energy} \\
+                        \hline
+                    \end{tblr}
+                \caption{ caption }  
+                \end{table}
+
+                \begin{itemize}
+                    \item \code{Use Parameter Blending}:    Operator nodes include an option to blend their background and foreground into
+                                                            a single material when toggling on Use Parameter Blending. Because Substrate Operators
+                                                            can create complex material appearances by mixing and layering slabs together, their expense
+                                                            at runtime (primarily due to ligthing evaluation) can be costly to performance.
+                                                            Parameter blending is an optimization that trades expensive lighting evaluation
+                                                            for runtime performance and less costly lighting evaluation.
+                \end{itemize}
+                
+                
+            
+    \section{HLSL}
+
+        \begin{itemize}
+            \item High-Level Shader Language := C-like language
+            \item 
+        \end{itemize}

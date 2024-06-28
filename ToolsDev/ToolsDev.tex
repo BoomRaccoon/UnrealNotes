@@ -1,0 +1,239 @@
+\chapter{Develop tools and extend the editor}
+    \section{extra notes}
+        \begin{itemize}
+            \item we need to know the \code{Extension points} when we add menu entries
+            \item for that we can enable the option to \code{display ui extension points} in editor settings
+            \item 
+            \begin{itemize}
+                \item \code{Blutility}
+				\item \code{EditorScriptingUtilities}
+                \item \code{ContentBrowser}
+            \end{itemize}
+            \item headers:
+            \begin{itemize}
+                \item \code{EditorAssetLibrary.h}
+                \item \code{Framework/Notifications/NotificationManager.h}
+                \item \code{Widgets/Notifications/SNotificationList.h}
+                \item \code{Misc/MessageDialog.h}
+                \item \code{ObjectTools.h}
+                \item \code{}
+            \end{itemize}
+            \item 
+            \item \code{FAssetData}
+            \begin{itemize}
+                \item \code{FAssetData::AssetName} := The name of the asset
+                \item \code{FAssetData::PackageName} := path to asset from Content/Game
+                \item \code{FAssetData::AssetClassPath::GetAssetName()} := the type of the asset eg. \glqq StaticMesh\grqq
+            \\ \end{itemize}
+            \item \code{Viewport} := 
+            \item \code{ViewportClient} := processes the input to the viewport and draws the viewport
+            \item \code{Toolkits} := are supposed to hold the UI
+            \item 
+            \item \code{UAssetEditor::Initialize();}
+            \begin{itemize}
+                \item This will do a variety of things including registration of the asset editor, creation of the toolkit
+                \item (via CreateToolkit()), and creation of the editor mode manager within the toolkit.
+                \item The asset editor toolkit will do the rest of the necessary initialization inside its PostInitAssetEditor.
+            \end{itemize}
+            \item improve asset loading
+            \begin{itemize}
+                \item \code{UToolMenu} is used to add Right-Click entries
+                \item added tools to the context menu of asset will benefit from using \code{Asset Tag Data} because loading can be more specific
+                \item run the editor with -WarnIfAssetsLoaded (ConfigurationProperties -> Command Arguments)
+            \end{itemize}
+
+            
+        \end{itemize}
+        AssetDefinitions.h : line 280
+        \begin{lstlisting}
+* 
+* Unfortunately I can't prevent people from backsliding, at least for now.  Even after fixing the APIs to not require
+* loading, people need to be cleverer (Use Asset Tag Data) in how they provide right click options for assets.  But to
+* help, you can run the editor with -WarnIfAssetsLoaded on the command line.  I've added a new utility class to the
+* engine called, FWarnIfAssetsLoadedInScope, it causes notifications with callstacks to be popped up telling you what
+* code is actually responsible for any asset loads within earmarked scopes that should NOT be loading assets.
+* 
+* 
+* Registration
+* Registering your Asset Definition is no longer required like it was for Asset Actions.  The UObjects are automatically
+* registered with the new Asset Definition Registry (UAssetDefinitionRegistry).
+* 
+* It's very important that you do not load the asset in your CanExecuteAction callback or in this self callback, you should save that until you finally get Executed.
+* If you're looking for examples, there are tons you'll find by searching for \glqq namespace MenuExtension\_\grqq
+        \end{lstlisting}
+        FROM THE UVEDITOR
+        \begin{lstlisting}
+* The actual asset editor class doesn't have that much in it, intentionally. 
+* 
+* Our current asset editor guidelines ask us to place as little business logic as possible
+* into the class, instead putting as much of the non-UI code into the subsystem as possible,
+* and the UI code into the toolkit (which this class owns).
+*
+* However, since we're using a mode and the Interactive Tools Framework, a lot of our business logic
+* ends up inside the mode and the tools, not the subsystem. The front-facing code is mostly in
+* the asset editor toolkit, though the mode toolkit has most of the things that deal with the toolbar
+* on the left.
+        \end{lstlisting}
+
+    \section{ways to extend the editor}
+        \begin{itemize}
+            \item Editor Utility
+            \begin{itemize}
+                \item \code{Utility Actor}
+                \item \code{Utility Object}
+                \item \code{Utility Asset Action}
+            \end{itemize}
+        \end{itemize}
+
+        
+    \section{Create Utility-Actor-Action (ScriptedAction in RightClickMenu in level viewport)}
+        
+        \begin{itemize}
+            \item create an \code{Actor-Action-Utility}
+            \item add \code{Custom-Event} for each action you want to add
+            \item enable \code{Call in Editor} on the Event
+        \end{itemize}    
+        
+        \uline{Making \code{Actions} context sensitive (for specific asset classes)}
+        \begin{itemize}
+            \item use \code{GetSupportedClass}
+        \end{itemize}
+        \includegraphics[width=\textwidth]{GetSupportedClassExample.jpg}
+
+
+    \section{Add Right Click entries}
+        \begin{itemize}
+            \item so we have to:
+            \item \code{access array of menu entries:} use those $\downarrow$
+            \item \code{GetAllPathViewContextMenuExtenders()} \code{GetAllAssetViewContextMenuExtenders()}
+            \item 
+            \begin{lstlisting}
+                ContentBrowserModuleMenuExtension.Add(FContentBrowserMenuExtender_SelectedPaths::CreateRaw(this, &FAssistingUtilsModule::CustomCBMenuExtender));
+            \end{lstlisting}
+            \item 
+            \item when we build the menu we will specify/create another delegate that will be called when our menu entry is selected
+            \item \code{AddMenuExtension()}
+            \item 
+            \item the \code{FUICommandList} in the menu-builder is used to specify custom shortcuts
+        \end{itemize}
+        
+        \begin{enumerate}
+            \item FNewModule::StartupModule
+            \begin{enumerate}
+                \item load \code{ContentBrowserModule}
+                \item get the array of menu entries delegates
+                \item create new entry
+                \item \code{BindRaw} a function to the new entry
+                \item and \code{Add()} the new entry to the array
+            \end{enumerate}
+            \item TSharedRef<FExtender> FNewModule::ReturnCreatedExtender(const TArray<FAssetData>\& AssetInfo)
+            \begin{enumerate}
+                \item create \code{TSharedRef<FExtender>}
+                \item add a MenuExtension
+                \item 
+            \end{enumerate}
+        \end{enumerate}
+
+        \begin{lstlisting}
+    /* NewModule.cpp 
+    *  FNewModule::StartupModule */
+    FContentBrowserModule LoadedCBM = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>("ModuleManager") // 1.1
+    TArray<FContentBrowserMenuExtender_SelectedAssets>& AssetExtender_A = LoadedCBM.GetAllAssetViewContextMenuExtenders(); // 1.2
+    FContentBrowserMenuExtender_SelectedAssets MyAssetExtender; // 1.3
+    MyAssetExtender::BindRaw(this, &FNewModule::ReturnCreatedExtender); // 1.4
+    AssteExtender_A.Add(MyAssetExtender); // 1.5
+        \end{lstlisting}
+
+    \section{UICommands}
+        \begin{itemize}
+            \item basic setup
+            \begin{itemize}
+                \item create new class that inherits from \code{public TCommands<FYourClassNameCommands>}
+                \item   
+                \item in \code{.h} 
+                \item \code{virtual void RegisterCommands() override;}
+                \item create constructor
+                \begin{lstlisting}
+    FSlateQuickstartWindowCommands()
+    : TCommands<FbCommands>(
+        TEXT("SlateQuickstartWindow"),
+        NSLOCTEXT("Contexts", "SlateQuickstartWindow", "SlateQuickstartWindow Plugin"),
+        NAME_None,
+        FSlateQuickstartWindowStyle::GetStyleSetName())
+                \end{lstlisting}
+                \item add \code{TSharedPtr< FUICommandInfo > commandName} for each command
+                \item  
+                \item in \code{.cpp} 
+                \item inside \code{RegisterCommands}
+                \begin{lstlisting}
+    UI_COMMAND(
+        TestCommand,
+        "TestCommand", 
+        "This is test command", 
+        EUserInterfaceActionType::Button, 
+        FInputGesture()
+    );
+                \end{lstlisting} 
+                \item 
+                \item 
+                \item in the module (that inherits from \code{IModuleInterface})(\code{.h}) add
+                \item \code{TSharedPtr<class FUICommandList> PluginCommands;}
+                \item 
+                \item call the \code{.Register()}-function of the your \code{TCommandList}-class
+                \item and map the commands to actions
+                \begin{lstlisting}
+    PluginCommands = MakeShareable(new FUICommandList);
+    PluginCommands->MapAction(
+        FTutorialPluginEditorCommands::Get().TestCommand,
+        FExecuteAction::CreateRaw(this, &FTutorialPluginEditorModule::TestAction)
+    );
+                \end{lstlisting}
+            \end{itemize}
+        \end{itemize}
+
+
+    \section{Create a tab}
+        \begin{itemize}
+            \item has to be called on in the \code{StartupModule}
+            \item access the \code{FGlobalTabManager::Get()}
+            \item and register a new tab \code{RegisterNomadTabSpawner()}
+        \end{itemize}
+
+
+
+    \section{Creating a custom editor}
+        \begin{itemize}
+            \item \code{IToolkit} := is there for the visual representation
+            \item \code{FToolkitManager} := keeps track of all the toolkits
+            \item \code{Editor:} :=
+        \end{itemize}
+
+    \section{Code snippets}
+        \uline{Get selected assets in content browser:}
+        \begin{lstlisting}
+    TArray<FAssetData> AssetInfoArray;
+    AssetSelectionUtils::GetSelectedAssets(AssetInfoArray);
+        \end{lstlisting}
+
+        \uline{Get asset type of the selected assets}
+        \begin{lstlisting}
+    // after getting an array of FAssetData from the selected items
+    // in the content browser, we can use the AssetInfo
+    
+    // Will return a FName like "StaticMesh" "Texture2D"
+    AssetInfo.AssetClassPath.GetAssetName()
+        \end{lstlisting}
+    
+    \section{K2Nodes}
+        \subsection{Basics}
+            \begin{itemize}
+                \item dynamic functionality
+                \item inputs and outputs of a Node change depending on other inputs and outputs
+                \item functionality change input types
+                \item 
+                \item One way to think of it is a Blueprint Node that has two or more functions
+                      inside of it; one that takes the inputs, passes it around through N functions,
+                      then another function that returns the output, like a subgraph in Blueprints
+                \item \code{K2Node_SpawnActorFromClass} and \code{K2Node_GetDataTableRow} have solid comments and straightforward outcomes
+                \item 
+            \end{itemize}

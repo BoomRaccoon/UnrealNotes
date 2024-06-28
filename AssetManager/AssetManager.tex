@@ -1,0 +1,25 @@
+\chapter{AssetManager}
+    \begin{itemize}
+        \item Primary Asset :
+        \begin{itemize}
+            \item only \colorbox{mygray}{\lstinline{UWorld}} is a primary asset
+            \item directly manipulatable
+            \item Primary Assset ID \colorbox{mygray}{\lstinline{GetPrimaryAssetId}}
+            \item Primary Asset ID consists of 1.Unique primary asset type 2.Name
+        \end{itemize}
+        \item Secondary Asset :
+        \begin{itemize}
+            \item not directly handled
+            \item loaded when referenced or used by primary assets
+        \end{itemize}
+        \item \colorbox{mygray}{\lstinline{Streamable Manager}} structure performs actual work:
+        \begin{itemize}
+            \item asynchronously loading objects
+            \item keeping objects in memory
+        \end{itemize}
+        \item \colorbox{mygray}{\lstinline{AssetBundle}}
+        \begin{itemize}
+            \item is a named list of specific assets associated with a primary asset
+            \item \colorbox{mygray}{\lstinline{UPROPERTY(meta = (AssetBundles = "TestBundle")) [TSoftObjectPtr/FStringAssetReference]}}
+        \end{itemize}
+    \end{itemize}

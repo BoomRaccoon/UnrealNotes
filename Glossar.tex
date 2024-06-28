@@ -1,0 +1,498 @@
+\newglossaryentry{Controller}{
+    name={Controller},
+    description={Is a non-physical Actor that can posses a Pawn/Pawn-Derived. It is, in contrast to AIController, used for human player to control pawns.
+    In order to controll the character the Posses function is used. },
+    plural={}
+}
+
+
+\newglossaryentry{UPROPERTY}{
+    name={UPROPERTY},
+    description={is placed in front of a Variable declaration in order to make is accessible to the UE},
+    plural={}
+}
+
+\newglossaryentry{Asset}{
+    name={Asset},
+    description={
+        is just a set of UObjects serialized to disk },
+    plural={}
+}
+
+\newglossaryentry{Package}{
+    name={Package},
+    description={
+        UPackage is the top-level object inside an asset file and can have many objects inside it
+        (somethings like /Game/MyPackage.uobject0 and /Game/MyPackage.uobject1)},
+    plural={}
+}
+
+\newglossaryentry{Collisio Channel}{
+    name={Collision Channel},
+    description={
+        Defines how the object will react to traces. },
+    plural={}
+}
+
+\newglossaryentry{Collision Preset}{
+    name={Collision Preset},
+    description={
+        Each Preset contains the Object Type that should be assigned
+        and the responses for Trace and Object Channel},
+    plural={}
+}
+
+
+\newglossaryentry{Locomotion}{
+    name={Locomotion},
+    description={Advanced setup for animations with blendspaces},
+    plural={}
+}
+
+
+\newglossaryentry{Delegate}{
+    name={Delegate},
+    description={Binds a function to an event(which is Broadcast).},
+    plural={}
+}
+
+\newglossaryentry{Collision Response (ECR)}{
+    name={ECR},
+    description={The Enum ECollisionResponse is made up of Ignore, Overlap and Block and defines how objects collide (interact with each other)},
+    plural={}
+}
+
+\newglossaryentry{Procedure}{
+    name={Procedure},
+    description={Function with no return value},
+    plural={}
+}
+
+\newglossaryentry{Animation Graph}{
+    name={Animation Graph},
+    description={Contains the logic of the Animation-Blueprint. A State-Machine will determine which animation should be played.},
+    plural={}
+}
+
+\newglossaryentry{CRTP}{
+    name={curiously recurring template pattern},
+    description={
+        Solves the problem of slicing (of information) by inheriting from a templatet class
+        that takes in the defined class as the Template parameter.
+        },
+    plural={}
+}
+
+\newglossaryentry{Animation Modifier}{
+    name={Animation Modifier},
+    description={},
+    plural={}
+}
+
+\newglossaryentry{Behavior Trees}{
+    name={Behavior Trees},
+    description={Stores information about the states you can be in, and actions/tasks to perform depending on those states.},
+    plural={}
+}
+
+\newglossaryentry{Blackboard}{
+    name={Blackboard},
+    description={Stores the information for the different branches of the behavior tree to make the decisions},
+    plural={}
+}
+
+\newglossaryentry{EQS}{
+    name={EQS},
+    description={Environmental-Query-System },
+    plural={}
+}
+
+\newglossaryentry{Nav Mesh Volumes}{
+    name={Nav Mesh Volumes},
+    description={},
+    plural={}
+}
+
+
+\newglossaryentry{AI Perception}{
+    name={AI Perception},
+    description={Sends stiumli(information about what's happening in the surrounding area) to the behavior tree},
+    plural={}
+}
+
+\newglossaryentry{Cooking}{
+    name={Cooking},
+    description={
+        is the process of converting from an internal asset format to a platform-specific format.},
+    plural={}
+}
+
+\newglossaryentry{Modal window}{
+    name={Modal window},
+    description={
+        a window that is on top of the main window,
+        disables it and must be interacted with first before returning control to the main window},
+    plural={}
+}
+
+\newglossaryentry{FField}{
+    name={FField},
+    description={
+        Base class for refltion data objects},
+    plural={}
+}
+
+\newglossaryentry{UMG}{
+    name={UMG},
+    description={Unreal-Motion-Graphics is a visual UI builder},
+    plural={}
+}
+
+\newglossaryentry{Slate}{
+    name={Slate},
+    description={More advanced way to build an interface using C++. instead of the editor and visual scripting},
+    plural={}
+}
+
+\newglossaryentry{Level Streaming}{
+    name={Level Streaming},
+    description={Is a Asynchronous level loading mechanism to decrease memory usage by loading and unloading maps dynamically and thus creating seamless worlds},
+    plural={}
+}
+
+\newglossaryentry{Texture Streaming}{
+    name={Texture Streaming},
+    description={In essence just LOD for textures. Manages the texture size depending on distance.},
+    plural={}
+}
+
+\newglossaryentry{Object wild cards}{
+    name={Object wild cards},
+    description={Are the equivalent to generics in C++. Object Wild Card in Blueprint == Generic in C++},
+    plural={}
+}
+
+\newglossaryentry{Pool}{
+    name={Pool},
+    description={Refers to reserved (conceptual) memory and does not relate to acutal taken memory.},
+    plural={}
+}
+
+\newglossaryentry{SSGI}{
+    name={SSGI},
+    description={Is a technique to add dynamic indirect lighting. Best use with  lightmass.},
+    plural={}
+}
+
+\newglossaryentry{Texel}{
+    name={Texel},
+    description={Is a pixel of the texture map},
+    plural={}
+}
+
+\newglossaryentry{IES}{
+    name={IES},
+    description={Illumination Engineering Society }, %TODO:
+    plural={}
+}
+
+\newglossaryentry{Cached Shadow Map}{
+    name={Cached Shadow Map},
+    description={}, %TODO:
+    plural={}
+}
+
+\newglossaryentry{Volumetric Lightmaps}{
+    name={Volumetric Lightmaps},
+    description={}, %TODO:
+    plural={}
+}
+
+\newglossaryentry{Bounds}{
+    name={Bounds},
+    description={Are boxes drawn around the objects.},
+    plural={}
+}
+
+\newglossaryentry{Gameplay Timer}{
+    name={Gameplay Timer},
+    description={Schedules actions.},
+    plural={}
+}
+
+\newglossaryentry{Timer Manager}{
+    name={Timer Manager},
+    description={Manages all the Gameplay Timer.},
+    plural={}
+}
+
+\newglossaryentry{streaming distance}{
+    name={streaming distance},
+    description={},
+    plural={}
+}
+
+\newglossaryentry{Build rules}{
+    name={Build rules},
+    description={Script to specify the referenced modules by your custom module},
+    plural={}
+}
+
+\newglossaryentry{Target rules}{
+    name={Target rules},
+    description={Script to specify },
+    plural={}
+}
+
+\newglossaryentry{GameMode}{
+    name={GameMode},
+    description={Defines the rules of the game (APawn, APlayerController, APlayerState).},
+    plural={}
+}
+
+\newglossaryentry{Blueprintable}{
+    name={Blueprintable},
+    description={Is allowed to be used as a base class for blueprints},
+    plural={}
+}
+
+\newglossaryentry{BlueprintType}{
+    name={BlueprintType},
+    description={Is allowed to be specified as a variable type in blueprints},
+    plural={}
+}
+
+\newglossaryentry{RHI}{
+    name={\uline{R}endering \uline{H}ardware \uline{I}nterface},
+    description={Is allowed to be specified as a variable type in blueprints},
+    plural={}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   NIAGARA   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newglossaryentry{Niagara System}{
+    name={Niagara System},
+    description={Are containers for multiple emitters combined in ONE effect.  },
+    plural={}
+}
+
+\newglossaryentry{Niagara Emitters}{
+    name={Niagara Emitters},
+    description={Are containers for Modules. },
+    plural={}
+}
+
+\newglossaryentry{Niagara Modules}{
+    name={Niagara Modules},
+    description={Are the base of Niagara VFX. The Modules are built using High-Level-Shading-Language.},
+    plural={}
+}
+
+\newglossaryentry{Niagara Item}{
+    name={Niagara Item},
+    description={Is a part of a system or emitter that the user cannot create. Example: system properties, emitter properties and renderers},
+    plural={}
+}
+
+\newglossaryentry{Niagara Data interface}{
+    name={Niagara Data Interface},
+    description={Allow access to arbitrary data like mesh data, audio, skeletal mesh data ...},
+    plural={}
+}
+
+\newglossaryentry{Niagara Stage}{
+    name={Niagara Stage},
+    description={Is a way to organize the order of execution},
+    plural={}
+}
+
+\newglossaryentry{Niagara Group}{
+    name={Niagara Group},
+    description={Is a way to group the data of modules and hence defines the NAMESPACE},
+    plural={}
+}
+
+\newglossaryentry{Asset Registry}{
+    name={Asset Registry},
+    description={in memory stored list of unloaded assets. },
+    plural={}
+}
+
+\newglossaryentry{Character}{
+    name={Character},
+    description={Pawns that have a mesh, collision, and built-in movement logic},
+    plural={}
+}
+
+
+\newglossaryentry{Animation Sequence}{
+    name={Animation Sequence},
+    description={is an animation for a specific Skeleton},
+    plural={}
+}
+
+
+\newglossaryentry{Blend Space}{
+    name={Blend Space},
+    description={enables you to play different Animation Sequences depending on a given variable (e.g. speed)},
+    plural={}
+}
+
+
+\newglossaryentry{Animation Montage}{
+    name={Animation Montage},
+    description={enables you to add additional logic to Animation Sequences like sound, particle effects, notifcations ...},
+    plural={}
+}
+
+
+\newglossaryentry{Component}{
+    name={Component},
+    description={provides a piece of functionality that can be added to an actor
+    and thus do not exist by themselves. Are the only way to render meshes and images
+    ,implement collision, play audio ... everything the player sees or interacts with
+    in the world. In contrast to sub-objects, components
+    instances wihthin an actor will be instanced},
+    plural={}
+}
+
+\newglossaryentry{bSweep}{
+    name={bSweep},
+    description={Whether we sweep to the destination location, triggering overlaps along the way and stopping short of the target if blocked by something.},
+    plural={}
+}
+
+
+\newglossaryentry{Subsystem}{
+    name={Subsystem},
+    description={are automatically instanced classes with managed lifetimes.},
+    plural={}
+}
+
+
+\newglossaryentry{Blueprint Interface}{
+    name={Blueprint Interface},
+    description={where you declare functions but leave the implementation to the blueprints that use the interface. So it's just like a interface in programming},
+    plural={}
+}
+
+
+
+\newglossaryentry{Game State}{
+    name={Game State},
+    description={},
+    plural={}
+}
+
+
+\newglossaryentry{Event Dispatcher}{
+    name={Event Dispatcher},
+    description={Allows a blueprint class to report on its state to the level blueprint},
+    plural={}
+}
+
+
+\newglossaryentry{BSP Brush}{
+    name={BSP Brush},
+    description={is an Actor used to block-out levels. },
+    plural={}
+}
+
+\newglossaryentry{Primary Asset ID}{
+    name={Primary Asset ID},
+    description={How to refer to an asset the asset manager is managing.},
+    plural={}
+}
+
+\newglossaryentry{Data Layer}{
+    name={Data Layer},
+    description={},
+    plural={}
+}
+
+\newglossaryentry{Material Layer}{
+    name={Material Layer},
+    description={is an Asset to create a layer that can be masked or blended with other layers in the material},
+    plural={}
+}
+
+\newglossaryentry{Material Layer Blend}{
+    name={Material Layer Blend},
+    description={is an asset to create a mask for blending two layers together},
+    plural={}
+}
+
+\newglossaryentry{Material Expresiion}{
+    name={Material Expresiion},
+    description={},
+    plural={}
+}
+
+\newglossaryentry{World}{
+    name={World},
+    description={The World is the top level object representing a level or a sandbox in which Actors and Components will exist and be rendered.},
+    plural={}
+}
+
+\newglossaryentry{Navigation Invocer}{
+    name={Navigation Invocer},
+    description={},
+    plural={}
+}
+
+\newglossaryentry{Anim Instance}{
+    name={Anim Instance},
+    description={Animation, -Sequence, -Montage or -Blueprint derives from the 'UAnimInstance'-Class. Used for character animaations.},
+    plural={}
+}
+
+\newglossaryentry{Conduit}{
+    name={Conduit},
+    description={Is a transition rule that can do '1 to many' , 'many to 1' or 'many to many' instead of the simple '1 to 1'},
+    plural={}
+}
+
+\newglossaryentry{mipmap}{
+    name={mipmap},
+    description={are pre-calculated, optimized sequences of images, each of which is a progressively lower resolution. MIP(multum in parvo = much in little)},
+    plural={}
+}
+
+\newglossaryentry{Module}{
+    name={Module},
+    description={},
+    plural={}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%      GAS    %%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newglossaryentry{GLS-Avatar}{
+    name={GLS-Avatar},
+    description={
+        Is the physical representation of the ASC},
+    plural={}
+}
+
+\newglossaryentry{GLS-Owner}{
+    name={GLS-Owner},
+    description={
+        Actor that holds the ASC},
+    plural={}
+}
+
+\newglossaryentry{ASC}{
+    name={ASC},
+    description={
+        AbilitySystemComponent},
+    plural={}
+}
+
+\newglossaryentry{Latent Task}{
+    name={Latent Task},
+    description={
+        A task that is executed over multiple frames},
+    plural={}
+}

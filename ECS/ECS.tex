@@ -1,0 +1,122 @@
+\chapter{Mass Entity-Component-System}
+    Normally you have \code{Classes} contain \code{Data} and \code{Methods} \\
+    An \code{ECS}, on the other hand, saves \code{Data} and \code{Methods} seperatly. \\
+    Additionally, an ECS can \code{multiple Parents}
+
+    \section{Enable}
+        Enable plugins
+        \begin{itemize}
+            \item MassAI
+            \item MassCrowd
+            \item MassEntity
+            \item MassGameplay
+        \end{itemize}
+         \includegraphics[width=\textwidth]{MassPlugins.png}
+
+    \section{Basics}
+        \begin{itemize}
+            \item there are Entities
+            \item Entities hold Traits
+            \item Traits assign Fragments to entities
+            \item Data is held in Fragments
+            \item Processors are used to manipulate the data
+            \item Tags are used to filter for specific Entities
+            \item 
+            \item Add Fragment requierements
+            \item 
+            \item Archetype := Entity + Traits
+        \end{itemize}
+        \includegraphics[width=\textwidth]{EscStructure.png}
+
+
+    \section{Workflow}
+        \begin{itemize}
+            \item creating new \code{Trait} := \code{Miscellaneous -> Data Asset} of type \code{MassEntityConfigAsset}
+            \item Adding \code{Fragments} := (\code{USTRUCT struct UMassTraitBase StructName : public MassFragment}) to the Entity
+            \item Attaching \code{Fragments} to \code{Traits} :=
+            \begin{itemize}
+                \item override the \code{BuildTemplate} virtual function
+                \item call \code{BuildContext.AddFragment<FFragmentName>();}
+            \end{itemize}  
+            \item Adding \code{Processor} := 
+            \begin{itemize}
+                \item add \hyperref[MassConstructor]{Constructor}
+                \item override \code{protected} \code{ConfigureQueries()} function
+                \item override \code{Execute(...)} function 
+                \item add a \code{private: FMassEntityQuery EntityQuery}
+            \end{itemize} 
+            \item Add an Actor to the scene:
+            \begin{itemize}
+                \item \code{Mass Spawner} := used to spawn Entities (how many, which MassEntityConfigAsset to use )
+                \item \code{Mass Bubble Info Base} := 
+                \item \code{Mass Crowd Client Bubble Info} := 
+                \item \code{Mass Navigation Testing Actor} := 
+            \end{itemize}
+        \end{itemize}
+
+
+    \section{Entity}
+        \begin{itemize}
+            \item Entity :=
+            \item lightweight actor
+        \end{itemize}
+
+    \uline{include all Entities with a Tag or exclude all Entities with a Flag}
+        \begin{lstlisting}
+    EntityQuery.AddTagRequirement<FBuildyMassBuilderTag>(EMassFragmentPresence::All);
+    EntityQuery.AddTagRequirement<FBuildyMassWarriorTag>(EMassFragmentPresence::None);
+        \end{lstlisting}
+
+        \uline{Add Tags}
+        \begin{lstlisting}
+    USTRUCT()
+    struct FBuildyMassBuilderTag : public FMassTag
+    {
+        GENERATE_BODY()
+    };
+        \end{lstlisting}
+
+    \section{Traits}
+        \begin{itemize}
+            \item Traits := 
+            \begin{itemize}
+                \item lightweigt components 
+                \item tell which Fragments to add to an Entity
+            \end{itemize}
+        \end{itemize}
+
+        \uline{Constructor for }
+        \begin{lstlisting}
+
+        \end{lstlisting}
+        \label{MassConstructor}
+
+
+    \section{Fragment}
+        real data define smallest structs that define state of a given functionality
+
+
+
+
+    \section{Processors}
+        \begin{itemize}
+            \item entities will be filtered by the fragments they hold
+            \item only the fragments that a processor can manipulate will be forwarded to the processor
+            \item is auto registered $\rightarrow$ MassSystem ensures that there will be a processor instance for the Entities
+            \item one processor is processing all the data from all Entity instances in the level
+        \end{itemize}    
+    
+        \subsection{MassObserver}
+            \includegraphics[width=\textwidth]{MassObserver_Class.png}
+            \includegraphics[width=\textwidth]{MassObserver_Registration.png}
+            
+            \begin{itemize}
+                \item \code{UMassObserverProcessor}
+                \begin{itemize}
+                    \item helps initializing not yet initialized Fragments
+                    \item registration must specify the type $\rightarrow$ \code{ObserverType = FAgentRadiusFragment::StaticStruct()}
+                \end{itemize}
+                \item 
+            \end{itemize}
+
+    

@@ -1,0 +1,512 @@
+\chapter{Animations}
+
+    \section{Unsorted}
+        \begin{itemize}
+            \item ANimation Curve := 
+        \end{itemize}
+
+
+    \section{Basic Setup}
+        \begin{itemize}
+            \item Create 'Animation Blueprint' for the character in question with the appropriate skeleton
+            \item Create a blendspace with the character skeleton mesh
+            \item create an animation graph
+        \end{itemize}
+
+
+    \section{Basic Assets}
+        \subsection{Skeleton Asset}
+            \begin{itemize}
+                \item equivalent to the blender armature
+                \item you can attach skeletal meshes to them
+                \item skeletons can be used by multiple meshes
+                \item rules:
+                \begin{itemize}
+                    \item keep order and names
+                    \item you can append any number of bones
+                    \item you can add any number of bones
+                \end{itemize}
+            \end{itemize}
+            \href{https://docs.unrealengine.com/4.27/en-US/AnimatingObjects/SkeletalMeshAnimation/Skeleton/}{Official Doc}
+
+        \subsection{Animations Sequence}
+            \begin{figure}
+                \includegraphics[width=\textwidth]{Animation_Sequence.jpg}
+                \caption{How the Editor-Window looks like for Animation-Sequences}
+            \end{figure}
+            \begin{itemize}
+                \item are the basic animations that are exported from blender and imported in UE5
+                \item Each Animation Sequence asset targets a specific Skeleton and can only be played on that Skeleton.
+                \item 'Notify' := will fire events at specific points during the 'Animation Sequence'
+                \item there are different types of Notifies:
+                \begin{itemize}
+                    \item Skeletal Notify := is a generic notify and can be accessed inside of Animation Blueprints and their State Machines E.g.: foot steps, particle effects
+                    \item Cloth Simulation Notifies := can change the cloth simulation property to play, pause, resume and reset 
+                    \item Play Particle Effect := will play a particle effect and it's not available in Animation Blueprints but the details panel gives some options
+                    \item Play Sound := will play a sound and it's not available in Animatin Blueprints but the details panel gives some options
+                    \item Reset Dynamics := will reset any AnimDynamics
+                \end{itemize}
+                \item 'Notify State' := 
+                \item 'Sync Marker' :=
+                \item 
+                \item Can be additive := so they can influence other animations inside your 'Animation Blueprint'
+                \item in the 'Animation Sequence' under the section 'Additive Settings' :
+                \begin{itemize}
+                    \item No additive := 
+                    \item Local Space := 
+                    \item Mesh Space := 
+                \end{itemize}
+            \end{itemize}
+            \href{https://docs.unrealengine.com/4.27/en-US/AnimatingObjects/SkeletalMeshAnimation/Sequences/}{Offizial Doc}
+
+        \subsection{Animation Curves}
+            \begin{itemize}
+                \item 
+            \end{itemize}
+
+        \subsection{Animation Blueprints}
+            \begin{figure}[ht]
+                \includegraphics[]{Animation_Blueprint.jpg}
+                \caption{Structure of a Animation Blueprint}
+            \end{figure}
+            \begin{itemize}
+                \item Controls animation of ONE skeletal Mesh
+                \item Has an 'Anim Graph' \& a 'Event Graph'
+                \item Anim Graph := with state machine which is used for constant animations like idle, walking, running ...
+                \item Event Graph := 
+                \begin{itemize}
+                    \item Used to update variables
+                    \item 
+                    \item 'Event Blueprint Initialize Animation' used for the setup
+                    \item 'Event Blueprint Update Animation' is the equivalent to the 'Tick' in normal BPs
+                \end{itemize}
+                \item You will be able to define the exact behaviour inside the 'Animation Graph' with the help of a state machine
+                \item In order for the state machine to transition between states you need to feed it with the needed information
+                \item This information gathering will be setup inside of the 'Event Graph' of the 'Animation Blueprint'
+            \end{itemize}
+
+            \begin{itemize}
+                \item B(lend)S(paces) in the state machine will have input nodes
+                \item 'Layered blend per bone'
+                \item Base Pose: Animation 
+                \item Blend Poses: 
+            \end{itemize}
+    
+        \subsection{Animation Montage}
+            \begin{itemize}
+                \item 
+                \item 
+                \item enables you to combine animation sequences and add logic
+                \item exposing animation controls to blueprints or code
+                \item 
+                \item add logic to animations (ex. reloading)
+            \end{itemize}
+
+        \subsection{Blendspace}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{Blend_Space.jpg}
+            \caption{How the Editor-Window looks like for 'Blend Spaces'}
+        \end{figure}
+        \begin{itemize}
+            \item Blendspace := takes in input and blends between different animations depending on the input values
+            \item the input values are inputs on nodes you add to the Animation Blueprint
+            \item 1D-Blendspaces := take in only 1 input
+            \item 2D-Blendspaces := take in 2 inputs
+        \end{itemize}
+
+
+    \section{Retargeting}
+        \begin{minipage}{0.9\textwidth}
+            \begingroup \parfillskip=0pt
+                \begin{minipage}[t]{0.49\textwidth}
+                    \includegraphics[width=\textwidth]{ShowAllBones.png}
+
+                    \label{}
+                \end{minipage}
+                \begin{minipage}[t]{0.49\textwidth}
+                    \includegraphics[width=\textwidth]{NonRetargetedAnimation.png}
+
+                    \label{}
+                \end{minipage}
+            \par\endgroup
+        \end{minipage}
+        
+        \begin{itemize}
+            \item the skeleton saves the bones and their translation(location) data
+            \item in order to fix that $\rightarrow$ retarget the animation/animation-blueprint to another skeleton
+        \end{itemize}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{PreRetargeting.jpg}
+            \caption{}
+        \end{figure}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{PostRetargeting.jpg}
+            \caption{}
+        \end{figure}
+        \uline{Workflow:}
+        \begin{itemize}
+            \item Select animation you want to retarget
+            \item RC $\rightarrow$ 'Retarget Anim Asset'
+            \item Source Skeleton will be selected automatically
+            \item Search for the Skeleton you want to retarget to ('Target')
+            \item the location of the bones will be adjusted and a new 'Anim Asset' will be created
+            \item the rotation does NOT get adjusted $\rightarrow$ the 'Base Pose' has to be adjusted in the 'Retarget Manager'
+            \item if the skeletons have differences you might have to change the bone mappings e.g.: greystone
+        \end{itemize}
+        \uline{some settings to set before retargeting}
+        \begin{itemize}
+            \item in the skeleton you can set the type of \glqq TranslationRetargeting\grqq
+            \begin{itemize}
+                \item Animation := bone translation comes from the animation data, unchanged
+                \item Skeleton := bone translation comes from the target skeleton's bind pose
+                \item Animation scaled := comes from the animation data but is scaled by the skeleton proportions
+                \item Animation relative
+            \end{itemize}
+        \end{itemize}
+
+    
+    \uline{copy pose from mesh}  
+    \begin{itemize}
+        \item feeds in skeletal information from one skeleton to another
+        \item takes in source mesh component
+        \item 'use attached parent' to get the parent in the ABP
+        \item skeletons don't have to match
+        \item name and hierarchy match
+    \end{itemize}
+	
+    \uline{retarget pose from mesh}
+    \begin{itemize}
+        \item uses an IK-Retargetter
+        \item -> check compatability by opening the retargetter and set own character as preview
+        \item -> check animations
+        \item 'use attached parent'
+    \end{itemize}
+    
+    \subsection{IK-Retargetter}
+        \begin{itemize}
+            \item made with IK-Rigs for easier retargeting
+            \item 
+        \end{itemize}
+        \subsubsection{Notes from experience (solutions to problems) }
+            \begin{itemize}
+                \item finger retargeting is bad $\rightarrow$ disable \code{FK} retargeting on the metacarpals
+                \item 
+            \end{itemize}
+
+
+    \section{Skeleton LODs}
+        
+
+    \section{Addative Animation}
+        \begin{itemize}
+            \item animation is added on top of another
+            \item examples
+            \begin{itemize}
+                \item breathing
+                \item compression after jump
+                \item leaning forwards while running
+            \end{itemize}
+        \end{itemize}
+        
+        \subsection{Nodes}
+
+        
+        \href{https://www.youtube.com/watch?v=flHL3qJB3_I}{YT explenation}
+
+    \section{ALS}
+        \subsection{Custom character}
+            \begin{itemize}
+                \item create an IK-Rig for the character
+                \item create a retargetter depending for the custom character
+                \item create ABP for your character with \code{Retarget Pose from Mesh} and set
+                \begin{itemize}
+                    \item \code{Use attached Parent} to \code{true}
+                    \item \code{IKRetargeter Asset} to the one you created
+                \end{itemize}
+                \item add a \glqq Sekeletal Mesh component\grqq for your custom character
+                \item set
+                \begin{itemize}
+                    \item \code{Hidden in Game} to \code{true}
+                    \item under Optimization set \code{Visibility based anim tick option} to \code{Always Tick Pose and Refresh Bones}
+                \end{itemize}
+                
+            \end{itemize}
+
+    \section{Blend Poses depending on a Boolean value}
+        \href{https://www.youtube.com/watch?v=TiQjjcvM7Eo}{YT explenation}
+    
+
+    \section{AnimDynamics}
+        \begin{itemize}
+            \item is a node inside the AnimGraph
+            \item can be used to add physically based secondary animations for pouches, necklaces, backpacks ...
+            \item detailed video under \href{https://www.youtube.com/watch?v=5h5CvZEBBWo}{https://www.youtube.com/watch?v=5h5CvZEBBWo}
+        \end{itemize}
+
+    \section{Animation Modifier}
+        Enable users to define a sequence of actions for a given animation sequence or skeleton which enables Animation Sync Markers
+
+    \section{State Machine vs Animation Montage}
+        Something that happens upon a button press (attack) \\
+        Also interruptable animations are placed here. You will specify a specific frame on which the animation can
+        branch out playing different animations depending on some condition \\
+        Slots 
+
+        Nodes for the CharacterBP:
+        \begin{itemize}
+            \item Play Anim Montage (simple)
+            \item Play Montage (way more complex)
+            \item Layered blend per bone
+            \item blend poses by bool
+        \end{itemize}
+    \smallskip
+
+
+    \section{Blending Animations with Blendspace \& Animation-Graph}
+        \uline{Blendspaces}
+
+    \smallskip
+        \uline{Animationsgraph}
+        \begin{itemize}
+            \item AnimationsGraphs have Animation-States between which you can switch depending on conditions
+            \item 
+        \end{itemize}
+
+    \section{Add muscle progress or Head/Body Rotation}
+        \begin{itemize}
+            \item the 'Transform Bone'-Node in the 'AnimGraph' can manipulate specific bones
+            \item e.g.: rotate the head depending on cursor location || scale a body part depending on muscle mass ...
+        \end{itemize}
+
+    \section{Example LeftRightDab}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{LeftRightDab.jpg}
+            \caption{Example setup for leaning where bool values are set in the character BP and used in the AnimBP}
+        \end{figure}
+
+    \section{Clothing}
+        \href{https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/Physics/Cloth/Overview/}{Official Doc}
+
+    \section{Veretex-Animation}
+        \begin{itemize}
+            \item create 'Animation Sequences'
+            \item combine all animations into a 'Animation Composite'
+            \item use maya with 'vertex animation tools' to create vertex animation textures %TODO: Blender?
+            \item 
+        \end{itemize}
+
+    \section{Skeleton LODs}
+         \includegraphics[width=\textwidth]{Skeleton_Editor.jpg}
+        how to add LODs for the skeleton:
+        \begin{itemize}
+            \item go into the open the 'Skeleton Editor' of the skeleton
+            \item go into the 'Mesh' section
+            \item specify the bones you want to remove for each LOD in 'Asset Details'
+        \end{itemize}
+        \includegraphics[width=\textwidth]{Asset_Details.jpg}
+        \href{https://www.youtube.com/watch?v=ti8NopRIgFs}{YT ref}
+
+
+
+    \section{Motion Warping}
+            \begin{itemize}
+            \item Motion Warping := character animations will be adjusted depending on prerequisites (move to certain location before playing the next section of an animation)
+            \item \code{RootMotion} must be enabled on the Animation
+            \item 
+            \item Setup:
+            \begin{itemize}
+                \item Create Notifies 'Motion Warping' == Motion Windows (1 for rotation and 1 for translation)
+                \item before you play the animation montage, use 'Add or Update Sync Point'-Nodes for every 'Motion Warping'-Notify
+                \item use 'Make Motion Warping Sync Point'-Node to specify where it should warp to
+                \item 'Warp Point Anim Provider' will be in the next UE version
+            \end{itemize}
+        \end{itemize}
+
+    \section{ControlRig}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{EditorLayout.png}
+            \caption{Recommended layout (used by a lot of epic employees)}
+            \label{}
+        \end{figure}
+
+        
+
+        \textbf{\uline{basic events in BP}}        
+        \begin{itemize}
+            \item Construction: where we can create the constrols and extra bones
+            \item Forwards-Solve: where the logic for Ctrl $\rightarrow$ Bone is setup
+            \item Backwards-Solve: where 
+            \item Interaction-Event: any time the controls als moved
+        \end{itemize}
+        \textbf{\uline{some concepts}}
+        \begin{itemize}
+            \item Indirect-Controls / Proxy-Control: drives multiple things
+            \item dynamic hierarchy: where controls can
+            \item 
+        \end{itemize}
+        
+        \begin{figure}
+            \includegraphics[width=\textwidth]{Animation_UsefulOptions.png}
+            \caption{Some useful options for the viewport when in AnimationMode}
+            \label{}
+        \end{figure}
+
+        \textbf{\uline{Useful shortcuts}}
+        \begin{itemize}
+            \item Ctrl + G: reset transform on selected
+            \item Ctrl + Shift + G: Reset all control transform
+            \item 1 Create Get Transform Node
+            \item 2 Create Set Transform Node
+        \end{itemize}
+
+        \subsection{Full-Body IK}
+            \begin{itemize}
+                \item create a ControlRig IK
+                \item add the 'Full Body IK'-Node and set the 'Root' to the first skinned bone (most cases pelvis)
+                \item Add effectors = $\rightarrow$ RC the bones $\rightarrow$ 'New' $\rightarrow$ 'New Control'
+                \item Unparent the effectors
+                \item Drag effectors into the 'Rig Graph' $\rightarrow$ connect the 'Transform' to 'Full Body IK'-Node
+                \item set bones
+                \item add the constraints under 'Bone Settings'
+                \item 
+                \item Bottom 'Full Body IK'-Settings:
+                \begin{itemize}
+                    \item 'Iterations': rel. cheap (100 not that bad)
+                    \item 'Mass Multiplier': bones rotate depending on their length $\rightarrow$ higher Mass-value = less rotation
+                    \item 
+                \end{itemize}
+            \end{itemize}
+
+    \section{Anim Link Layers}
+        \begin{itemize}
+            \item is a way to splilt huge anim\_BPs into smaller ones and link them together
+            \item 
+            \item are instances of animation blueprints
+            \item hold functions for every pose
+        \end{itemize}
+
+        \uline{SETUP}
+        \begin{itemize}
+            \item Create a seperate ABP
+            \item copy\&paste the state machines you want to split from the main graph
+            \item add \code{Linked Anim Graph}-Node to your main graph
+            \item select the ABP you created
+            \item assign variables that you update in the main ABP to the ones used in the linked graph
+            \item 
+            \item if the additional ABP needs the output of another ABP use \code{Input Pose}-Node in the using graph
+            \item $\hookrightarrow$ adds an input pin when it's used in a \code{Linked Anim Graph}-Node
+        \end{itemize}
+            \includegraphics[width=\textwidth]{Bilder/LinkedGraphDetails.png}
+
+        \uline{ANIMATION LAYER INTERFACE}
+        \begin{itemize}
+            \item used for dynamic linked graphs
+        \end{itemize}
+
+        \uline{SETUP}
+        \begin{itemize}
+            \item create an \code{Animtion Layer Interface}
+            \item add \code{Animation Layers}
+            \item 
+            \item create a default implementation in the main graph that will use the linked layer
+            \item eg.: use default logic as input\&result
+            \item 
+            \item create ABPs that implement that interface
+            \item implement the actual Layer (double click the animation layer in the \code{My Blueprint}-tab)
+            \item 
+            \item Add the specific \code{Linked Anim Layer}-Node where you want to use it
+            \item 
+            \item Set the linked graph from your characters Mesh-Component
+            \item 
+            \item unlink the anim
+        \end{itemize}
+            \includegraphics[width=\textwidth]{Bilder/LinkedLayerInterface.png}
+
+
+    \section{Usefull commands}
+        \code{showflag.bones 1}
+
+
+    \section{Motion Matching}
+
+        \subsection{Basic Concepts}
+            \begin{enumerate}
+                \item \code{Pose History} := stores the last X poses of the character
+                \item \code{Pose-Search-Database} := contains a list of animation assets and a schema
+                \item \code{Pose-Search-Schema} := describes what features/properties you care about (eg.: trajectory, position, velocity)
+                \item \code{Chooser-Table} := specifies what motion matching can currently use; uses many variables to reduce number of possible animations
+                \item \code{Interrupt Mode} := can be specified to either interrupt and change Pose-Search-Database or keep the currently running animation a little longer
+                \item 
+            \end{enumerate}
+
+
+        \subsection{Pose Search Database}
+            \begin{enumerate}
+                \item every channel has a weight, the higher the weight the more important the channel is
+            \end{enumerate}
+        
+
+
+        \subsection{}
+            \begin{enumerate}
+                \item each movement should have it's own pose search database $\rightarrow$ gives more precise pose selection
+                \item otherwise the chooser might stay longer in the wrong pose
+            \end{enumerate}
+
+
+        \subsection{Nodes}
+            \begin{table}[!htb]
+                \begin{tblr}{p{6cm} | p{12cm}}
+                    \hline
+                        Node & Description \\
+                    \hline
+                        Pose History & \makecell[l]{collects information for the specified bones, trajectories ...} \\
+                        Motion Matching & \makecell[l]{takes input (pose search database) \\ finds the best matching pose from the database and returns it} \\
+                        Evaluate Chooser & \makecell[l]{takes the output of the Motion Matching \\ and decides which animation to play} \\
+                    \hline
+                \end{tblr}
+            \caption{ caption }  
+            \end{table}
+
+        \subsection{Setup}
+
+        \begin{itemize}
+            \item first add a \code{Motion Matching}-Node to the AnimGraph
+            \item hook it up to the \code{Pose Histroy}-Node
+            \item 
+            \item create a \code{Motion Matching Data Asset}
+            \item add the animations you want to use
+            \item 
+            \item create a code{Space-Search-Schema}-Asset := describes what features/properties you care about
+            \item first select the skeleton it should be used on
+            \item add \code{Channels}
+            \item the \code{Samples}
+            \begin{itemize}
+                \item \code{Offset} := character-location on the trajectory at X seconds (negative := X seconds ago; positive := X seconds in the future)
+                \item \code{Weight} := how important is the sample
+            \end{itemize}
+        \end{itemize}
+
+        pose-search-feature-channel
+        \begin{itemize}
+            \item those have functions you can override
+            \item 
+        \end{itemize}
+
+        \subsection{Debugging}
+            tools:
+            \begin{itemize}
+                \item \code{Game Animation}
+                \item \code{Rewind Debugger}
+            \end{itemize}
+
+            \begin{itemize}
+                \item \code{ShowFlag.MotionMatching 1}
+                \item \code{ShowFlag.MotionMatching 2}
+            \end{itemize}
+
+            \subsubsection{Rewind Debugger}
+                \begin{itemize}
+                    \item \code{Cost} := 
+                    \item 
+                \end{itemize}
