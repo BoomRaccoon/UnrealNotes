@@ -1,148 +1,25 @@
 \chapter{C++}
 
     \section{Unsorted}
-
-
-    \begin{itemize}
-        \item disable optimisation for a specific file \\ \code{#pragma message("*****Optimisation disabled on " __FILE__) PRAGMA_DISABLE_OPTIMIZATION}
-        \item $\hookrightarrow$ and disable \code{unity build} in \code{.build.cs} with \code{bUseUnity = false;}
-        \item 
-        \item the FSlateApplication tracks a LastUserInteractionTime double property for any input to the application
-        \item \code{TObjectPtr} can just be replaced with rawPointer
-        \item Block-Comments above \code{UCLASS/UPROPERTY} will create documentation in the editor
-        \item 
-        \item \code{AddUObject} vs \code{AddUFunction} add uobject is a native delegate binding that works similar to add static, except checks for object alive first
-        add ufunction uses reflection to invoke it and is thus extremely slow
-        \item \code{OnConstruction} is called after \code{AActor::UserConstructionScript} is run first
-        \item 
-        \item code you need to include engine modules \code{System.IO.Path.GetFullPath(Target.RelativeEnginePath) + "Source\\Editor\\Blutility\\Private"}
-        \item 
-        \item \code{TSharedFromThis} is required to use \code{SharedThis} or \code{AsShared()}, but you can also use \code{MakeShareable} for a type that doesn't use it 
-                \code{MakeShared} creates a new reference counter
-                \code{MakeShareable} does not
-        \item can't use UPROPERTY in MACROS
-    \end{itemize}
-
-    \uline{Iterate over all UFUNCTIONs}
-    \begin{lstlisting}
-TFieldIterator<UFunction>
-
-for ( TFieldIterator<UFunction> FuncIt(FromClass, EFieldIteratorFlags::IncludeSuper); FuncIt; ++FuncIt )
-
-
-
-USTRUCT(BlueprintType)
-struct FCppPostStruct
-{
-	GENERATED_BODY()
-
-    UPROPERTY()
-	int32 userId;
-
-    UPROPERTY()
-	int32 id;
-
-    UPROPERTY()
-	FString title;
-    
-    UPROPERTY()
-	FString body;
-};
-
-FCppPostStruct* test = new FCppPostStruct();
-test->id = 0;
-test->userId = 0;
-test->title = "hello";
-test->body = "world";
-
-for (TFieldIterator<UProperty> It(test->StaticStruct()); It; ++It)
-{
-	UProperty* Property = *It;
-	FString VariableName = Property->GetName();
-}
-
-    \end{lstlisting}
-
-    \uline{Notes}
-    \begin{itemize}
-        \item Or often TDelegate<void()> (void is the return type, and you can specify the params in the parentheses)
-        \item Multicast just means it holds an array of delegates, multiple delegates bound to different functions and objects
-        \item Dynamic are also quite a bit slower
-    \end{itemize}
-
-
-    \begin{lstlisting}
-    UClass* Class = GetClass();
-    const bool bIsBlueprint = Class->bGeneratedBy;
-    if (!bIsBlueprint) return;
-    for (TFieldIterator<FProperty> PropertyIterator(this->GetClass()); PropertyIterator; ++PropertyIterator)
-    {
-    }
-    \end{lstlisting}
-    use Property->ContainerPtrToValuePtr, pass the object instace to its params
-    UClass is shared between same archetypes
-    but ContainerPtrToValuePtr gives you the correct variable from the Uobject passed to it
-
-
-    \begin{lstlisting}
-    GameplayTagEditorModule::AddNewGameplayTagToINI <.>
-    \end{lstlisting}
-
-    \uline{Possess on server}
-        \begin{lstlisting}
-    PossessedBy() // on server
-    APlayerController::AcknowledgePossession() // on client
-    OnRep::Controller // any
-    APawn::Restart // IDK
-        \end{lstlisting}
-
-
-    \uline{Possess on Client}
-        \begin{lstlisting}
-        \end{lstlisting}
-
-    \section{Snippets of info}
-    \uline{Force Garbage Collection}
-    \begin{lstlisting}
-GetWorld()->ForceGarbageCollection( true );
-    \end{lstlisting}
-
-        \uline{CreateDefaultSubobject vs NewObject}
-            \begin{itemize}
-                \item \code{CreateDefaultSubobject}
-                \begin{itemize}
-                    \item can ONLY be called in constructor
-                \end{itemize}
-            \end{itemize}
-            \begin{itemize}
-                \item \code{NewObject}
-                \begin{itemize}
-                    \item can be called outside constructor
-                \end{itemize}
-            \end{itemize}
-
-        \uline{TSoftObjPtr TWeakObjPtr}
         \begin{itemize}
-            \item \code{TSoftObjPtr}
-            \begin{itemize}
-                \item if you want to control when something is loaded
-                \item you can decide when to load
-                \item == TWeakObjPtr with a path
-            \end{itemize}
+            \item disable optimisation for a specific file \\ \code{#pragma message("*****Optimisation disabled on " __FILE__) PRAGMA_DISABLE_OPTIMIZATION}
+            \item $\hookrightarrow$ and disable \code{unity build} in \code{.build.cs} with \code{bUseUnity = false;}
+            \item 
+            \item the FSlateApplication tracks a LastUserInteractionTime double property for any input to the application
+            \item \code{TObjectPtr} can just be replaced with rawPointer
+            \item Block-Comments above \code{UCLASS/UPROPERTY} will create documentation in the editor
+            \item 
+            \item \code{AddUObject} vs \code{AddUFunction} add uobject is a native delegate binding that works similar to add static, except checks for object alive first
+            add ufunction uses reflection to invoke it and is thus extremely slow
+            \item \code{OnConstruction} is called after \code{AActor::UserConstructionScript} is run first
+            \item 
+            \item code you need to include engine modules \code{System.IO.Path.GetFullPath(Target.RelativeEnginePath) + "Source\\Editor\\Blutility\\Private"}
+            \item 
+            \item \code{TSharedFromThis} is required to use \code{SharedThis} or \code{AsShared()}, but you can also use \code{MakeShareable} for a type that doesn't use it 
+                    \code{MakeShared} creates a new reference counter
+                    \code{MakeShareable} does not
+            \item can't use UPROPERTY in MACROS
         \end{itemize}
-
-        \begin{itemize}
-            \item \code{TWeakObjPtr}
-            \begin{itemize}
-                \item if you want to reference something and not keep it alive for GC
-            \end{itemize}
-        \end{itemize}
-
-        \uline{OnPossess before BeginPlay}
-            \begin{itemize}
-                \item \code{OnPossess} will be executed even before the \code{BeginPlay}
-            \end{itemize}
-
 
     \section{Naming Conventions}
         \begin{itemize}
@@ -431,9 +308,9 @@ GetWorld()->ForceGarbageCollection( true );
             Will include the porperty to the garbage collection and set some porperties
             \begin{itemize}
                 \item Visibility: EditAnywhere, BlueprintReadWrite, BlueprintReadOnly, BlueprintCallable, 
-                \item Transient := it will not be saved on disk and a value that is derived (eg. damagePerSecond = damage/damgeInSeconds)
-                \item BlueprintImplementableEvent := so you can define the actual behaviour in the blueprint/LevelBlueprint (it's an event)
-                \item BlueprintNativeEvent := designed to be overriden by BP but also has a default native implementation named '[FUNCTIONNAME]\_Implementation'
+                \item Transient := it will not be saved on disk and any value that is derived from it (eg. damagePerSecond = damage/damgeInSeconds)
+                \item BlueprintImplementableEvent := lets you define the actual behaviour in the blueprint/LevelBlueprint
+                \item BlueprintNativeEvent := designed to be overriden by BP but also has a default C++ implementation named '[FUNCTIONNAME]\_Implementation'
                 \item Meta specifier:
                 \begin{itemize}
                     \item meta = (MakeEditWidget = "true") := 
@@ -442,21 +319,6 @@ GetWorld()->ForceGarbageCollection( true );
                 \item anything not designed for the packed game should be inside of \colorbox{mygray}{\lstinline{#if WITH_EDITOR ... #endif}}
             \end{itemize}
 
-            \uline{Make Variable available from BPs}
-            \begin{lstlisting}
-    UPROPERTY(BlueprintReadWrite)
-            \end{lstlisting}
-\smallskip
-            \uline{Variable can be seen everywhere}
-            \begin{lstlisting}
-    UPROPERTY(VisibleAnywhere)
-            \end{lstlisting}
-
-        \subsection{UFUNCTION}
-            \uline{Make Function callable from BPs}
-            \begin{lstlisting}
-    UFUNCTION(BlueprintCallable)
-            \end{lstlisting}
 \smallskip
             \uline{Function that can be implemented through BPs but otherwise executes the CPP implementation}
             \begin{lstlisting}
@@ -494,7 +356,7 @@ GetWorld()->ForceGarbageCollection( true );
                 \item switch case: each case must be like \code{case EnumName::CaseName}
             \end{enumerate}
 
-    \section{Top functions\&Variables for classes}
+    \section{Usefull functions\&Variables for classes}
         \subsection{Pawn}
             \uline{Variables}
             \begin{itemize}
@@ -520,7 +382,32 @@ GetWorld()->ForceGarbageCollection( true );
 \smallskip
     
 \smallskip
-    
+
+    \section{Asserts}
+        \href{https://dev.epicgames.com/documentation/en-us/unreal-engine/asserts-in-unreal-engine?application_version=5.3}{off. docs}
+        \begin{table}[!htb]
+            \begin{tblr}{p{6cm} | p{12cm}}
+                \hline
+                    function & description \\
+                \hline
+                    \SetCell[c=2]{l} \makecell[l]{CHECK := in Debug, Development, Test, and Shipping Editor builds, \\ except those ending in "Slow", which only operate in Debug builds \\ Defining USE\_CHECKS\_IN\_SHIPPING makes Check macros operate in all builds.} \\
+                    check | checkslow & \makecell[l]{Halts execution if Expression is false} \\
+                    checkf | checkfslow & \makecell[l]{Halts execution if Expression is false and prints the message} \\
+                    checkcode & \makecell[l]{Executes Code within a do-while loop structure that runs \\ useful to prepare information that another Check requires} \\
+                    checkNoEntry & \makecell[l]{Halts execution if the line is ever hit, similar to check(false),\\ but intended for code paths that should be unreachable} \\
+                    checkNoReentry & \makecell[l]{Halts execution if the line is hit more than once} \\
+                    checkNoRecursion & \makecell[l]{Halts execution if the line is hit more than once\\ on the same call stack (without leaving scope)} \\
+                    unimplemented & \makecell[l]{Halts execution if the line is ever hit, similar to check(false),\\ but intended for virtual functions that should be overridden and not called} \\
+                    \SetCell[c=2]{l} \makecell[l]{VERIFY := Verify macros evaluate their expressions even in builds where Check macros are disabled} \\
+                    verify & \makecell[l]{Halts execution if Expression is false in debug builds} \\
+                    \SetCell[c=2]{l} \makecell[l]{ENSURE := works with non-fatal errors} \\
+                    ensure & \makecell[l]{Halts execution if Expression is false in debug builds} \\
+                \hline
+            \end{tblr}
+        \caption{ caption }  
+        \end{table}
+        
+
     \section{Components}
         \uline{Major classes:}
         \begin{itemize}
@@ -547,19 +434,10 @@ GetWorld()->ForceGarbageCollection( true );
         \begin{itemize}
             \item open: \code{[ProjectName].Build.cs}
             \item public dependency names in \code{PublicDependenyModuleNames.AddRange} are \code{\"Core\", \"CoreUObject\", \"Engine\", \"InputCore\"}
-            \item add things you want to be included and useable by other modules ie: \code{\"UMG\", \"EnhancedInput\"}
             \item and to 'PrivateDependencyModuleNames.AddRange' to be only useable in current module ie.: \code{\"Slate\", \"SlateCore\"}
         \end{itemize}
 
 \bigskip
-
-    \section{Deleting CPP Classes}
-        If you want to delete a class you have to go into the .
-        \begin{itemize}
-            \item delete the cpp and h file of the class in the folder 'Source' of the Project
-            \item delete 'Binaries' in the project folder
-            \item and rebuild the project
-        \end{itemize}
 
     \section{Gameplay tags}
         \begin{itemize}
@@ -613,24 +491,6 @@ public:
     virtual void Deinitialize() override;
     // End USubsystem
         \end{lstlisting}
-
-    \section{Niagara}
-        \begin{itemize}
-            \item Has to be added in the build.cs file in the 'PublicDependencyModuleNames' Array as 'Niagara'
-            \item Objects are
-            \begin{itemize}
-                \item \code{UNiagaraSystem*}
-                \item \code{UNiagaraComponent*}
-            \end{itemize}
-            \item In order to use Functions use \code{#include NiagaraFunctionLibrary.h}
-            \item To add assign the Niagara emitter to the System use \code{ProjectileComp->SetAsset(ProjectileParticles)} 
-            \item spawning a NiagaraSystem is made with: \code{UNiagaraFunctionLibrary::SpawnSystemAtLocation(...)}
-        \end{itemize}
-
-        \subsection{Projectiles}
-            \begin{itemize}
-                \item 
-            \end{itemize}
 
     \section{Gameplay Timers}
         \begin{itemize}
@@ -757,13 +617,6 @@ void GetHintAndIcon(FString& Text, UTexture2D*& Texture);
         \end{lstlisting}
 
 
-    \section{Blueprint Library}
-        \begin{itemize}
-            \item create BlueprintFunctionLibrary
-            \item each function has to be \code{static}
-        \end{itemize}
-
-
     \section{JSON}
         \begin{itemize}
             \item 
@@ -827,11 +680,18 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
             \uline{Advanced: added springarmcomponent}
             \begin{lstlisting}
-    CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 600.f;
-	CameraBoom->bUsePawnControlRotation = true;
+                CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+                CameraBoom->SetupAttachment(GetRootComponent());
+                CameraBoom->TargetArmLength = 600.f;
+                CameraBoom->bUsePawnControlRotation = true;
             \end{lstlisting}
+        \uline{Add addtional navigation keys in UI (add this in the GameInstance or PlayerController)}
+\begin{lstlisting}
+FSlateApplication::Get().GetNavigationConfig()->KeyEventRules.Add(EKeys::W, EUINavigation::Up);
+FSlateApplication::Get().GetNavigationConfig()->KeyEventRules.Add(EKeys::A, EUINavigation::Left);
+FSlateApplication::Get().GetNavigationConfig()->KeyEventRules.Add(EKeys::S, EUINavigation::Down);
+FSlateApplication::Get().GetNavigationConfig()->KeyEventRules.Add(EKeys::D, EUINavigation::Right);
+\end{lstlisting}
 
         \uline{Push a StaticMesh Component}
 \begin{lstlisting}
@@ -1014,6 +874,128 @@ FVector* FoundXPositiveThing = Things.FindByPredicate([](const FVector& Item) { 
 //SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
 //bool bSuccess = UPackage::SavePackage(MyPackage, NewWorld, *FilePath, SaveArgs);
 \end{lstlisting}
+
+\uline{Iterate over all UFUNCTIONs}
+\begin{lstlisting}
+TFieldIterator<UFunction>
+
+for ( TFieldIterator<UFunction> FuncIt(FromClass, EFieldIteratorFlags::IncludeSuper); FuncIt; ++FuncIt )
+
+
+
+USTRUCT(BlueprintType)
+struct FCppPostStruct
+{
+GENERATED_BODY()
+
+UPROPERTY()
+int32 userId;
+
+UPROPERTY()
+int32 id;
+
+UPROPERTY()
+FString title;
+
+UPROPERTY()
+FString body;
+};
+
+FCppPostStruct* test = new FCppPostStruct();
+test->id = 0;
+test->userId = 0;
+test->title = "hello";
+test->body = "world";
+
+for (TFieldIterator<UProperty> It(test->StaticStruct()); It; ++It)
+{
+UProperty* Property = *It;
+FString VariableName = Property->GetName();
+}
+
+\end{lstlisting}
+
+\uline{Notes}
+\begin{itemize}
+\item Or often TDelegate<void()> (void is the return type, and you can specify the params in the parentheses)
+\item Multicast just means it holds an array of delegates, multiple delegates bound to different functions and objects
+\item Dynamic are also quite a bit slower
+\end{itemize}
+
+
+\begin{lstlisting}
+UClass* Class = GetClass();
+const bool bIsBlueprint = Class->bGeneratedBy;
+if (!bIsBlueprint) return;
+for (TFieldIterator<FProperty> PropertyIterator(this->GetClass()); PropertyIterator; ++PropertyIterator)
+{
+}
+\end{lstlisting}
+use Property->ContainerPtrToValuePtr, pass the object instace to its params
+UClass is shared between same archetypes
+but ContainerPtrToValuePtr gives you the correct variable from the Uobject passed to it
+
+
+\begin{lstlisting}
+GameplayTagEditorModule::AddNewGameplayTagToINI <.>
+\end{lstlisting}
+
+\uline{Possess on server}
+\begin{lstlisting}
+PossessedBy() // on server
+APlayerController::AcknowledgePossession() // on client
+OnRep::Controller // any
+APawn::Restart // IDK
+\end{lstlisting}
+
+
+\uline{Possess on Client}
+\begin{lstlisting}
+\end{lstlisting}
+
+
+\uline{Force Garbage Collection}
+\begin{lstlisting}
+GetWorld()->ForceGarbageCollection( true );
+\end{lstlisting}
+
+\uline{CreateDefaultSubobject vs NewObject}
+    \begin{itemize}
+        \item \code{CreateDefaultSubobject}
+        \begin{itemize}
+            \item can ONLY be called in constructor
+        \end{itemize}
+    \end{itemize}
+    \begin{itemize}
+        \item \code{NewObject}
+        \begin{itemize}
+            \item can be called outside constructor
+        \end{itemize}
+    \end{itemize}
+
+\uline{TSoftObjPtr TWeakObjPtr}
+\begin{itemize}
+    \item \code{TSoftObjPtr}
+    \begin{itemize}
+        \item if you want to control when something is loaded
+        \item you can decide when to load
+        \item == TWeakObjPtr with a path
+    \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item \code{TWeakObjPtr}
+    \begin{itemize}
+        \item if you want to reference something and not keep it alive for GC
+    \end{itemize}
+\end{itemize}
+
+\uline{OnPossess before BeginPlay}
+    \begin{itemize}
+        \item \code{OnPossess} will be executed even before the \code{BeginPlay}
+    \end{itemize}
+
+
     
 
     \subsection{Developer settings}

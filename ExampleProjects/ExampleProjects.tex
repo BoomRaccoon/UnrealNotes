@@ -106,7 +106,24 @@
 
     \section{Game Animation Sample (Motion Matching)}
 
-        
+        \begin{itemize}
+            \item character blueprint
+            \begin{itemize}
+                \item controls how the capsule moves around the level
+                \item has the traversal logic
+            \end{itemize}
+            
+            \item ABP
+            \begin{itemize}
+                \item 
+            \end{itemize}
+        \end{itemize}
+
+
+        \begin{itemize}
+            \item Future Velocity %TODO: what is this?
+            \item 
+        \end{itemize}
 
         \begin{itemize}
             \item have gait
@@ -116,10 +133,18 @@
         \end{itemize}
 
 
+        \begin{itemize}
+            \item multiple, nested chooser-tables that are used to select the correct animation
+            \item last chooser-table is the one that selects the animation based on the return value of functions defined in the ABP
+            \item \code{Continuing-Pose} := is a negative cost bias that we apply to the currently playing animation; can stop the chooser to go into the next state $\rightarrow$ InterruptMode will allow to actually change Databases
+        \end{itemize}
 
-        \subsection{Try Traversal}
-            \begin{enumerate}
+
+        \subsection{Try Traversal (CBP)}
+            \begin{itemize}
                 \item depends on spline points placed on the obstacles $\rightarrow$ isn't fully dynmamic
-                \item 
-            \end{enumerate}
+                \item seperate chooser- and motion-matching-node to select between different databases for hurdle, vault, mantle
+                \item depends on object-height, object-depth, distance, speed
+                \item PoseSearchBlueprintResult := gives the animation with arguments for play rate, looping ...
+            \end{itemize}
             
